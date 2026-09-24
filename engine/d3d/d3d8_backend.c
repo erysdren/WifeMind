@@ -2670,7 +2670,7 @@ static void BE_UploadLightmaps(qboolean force)
 			if (!TEXLOADED(lm->lightmap_texture))
 				lm->lightmap_texture = Image_CreateTexture("***lightmap***", NULL, (r_lightmap_nearest.ival?IF_NEAREST:IF_LINEAR)|IF_NOMIPMAP);
 			tex = lm->lightmap_texture->ptr;
-			if (lm->fmt != PTI_BGRA8)
+			if (lm->fmt != PTI_BGRA8 && lm->fmt != PTI_BGRX8)
 				continue;	//erk!
 			if (!tex)
 			{
