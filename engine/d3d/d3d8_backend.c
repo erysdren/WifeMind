@@ -4,6 +4,7 @@
 #ifdef D3D8QUAKE
 //#define FIXME //for Eukara to fix, if he ever wants to get the d3d8 renderer working fully.
 #include "shader.h"
+#include <windef.h>
 #if !defined(HMONITOR_DECLARED) && (WINVER < 0x0500)
     #define HMONITOR_DECLARED
     DECLARE_HANDLE(HMONITOR);
@@ -2741,46 +2742,46 @@ static void BE_RotateForEntity (const entity_t *e, const model_t *mod)
 
 		if (e->flags & RF_WEAPONMODELNOBOB)
 		{
-			vm[0] = vpn[0];
-			vm[1] = vpn[1];
-			vm[2] = vpn[2];
+			vm[0] = r_refdef.weaponmatrix[0][0];
+			vm[1] = r_refdef.weaponmatrix[0][1];
+			vm[2] = r_refdef.weaponmatrix[0][2];
 			vm[3] = 0;
 
-			vm[4] = -vright[0];
-			vm[5] = -vright[1];
-			vm[6] = -vright[2];
+			vm[4] = r_refdef.weaponmatrix[1][0];
+			vm[5] = r_refdef.weaponmatrix[1][1];
+			vm[6] = r_refdef.weaponmatrix[1][2];
 			vm[7] = 0;
 
-			vm[8] = vup[0];
-			vm[9] = vup[1];
-			vm[10] = vup[2];
+			vm[8] = r_refdef.weaponmatrix[2][0];
+			vm[9] = r_refdef.weaponmatrix[2][1];
+			vm[10] = r_refdef.weaponmatrix[2][2];
 			vm[11] = 0;
 
-			vm[12] = r_refdef.vieworg[0];
-			vm[13] = r_refdef.vieworg[1];
-			vm[14] = r_refdef.vieworg[2];
+			vm[12] = r_refdef.weaponmatrix[3][0];
+			vm[13] = r_refdef.weaponmatrix[3][1];
+			vm[14] = r_refdef.weaponmatrix[3][2];
 			vm[15] = 1;
 		}
 		else
 		{
-			vm[0] = r_refdef.playerview->vw_axis[0][0];
-			vm[1] = r_refdef.playerview->vw_axis[0][1];
-			vm[2] = r_refdef.playerview->vw_axis[0][2];
+			vm[0] = r_refdef.weaponmatrix_bob[0][0];
+			vm[1] = r_refdef.weaponmatrix_bob[0][1];
+			vm[2] = r_refdef.weaponmatrix_bob[0][2];
 			vm[3] = 0;
 
-			vm[4] = r_refdef.playerview->vw_axis[1][0];
-			vm[5] = r_refdef.playerview->vw_axis[1][1];
-			vm[6] = r_refdef.playerview->vw_axis[1][2];
+			vm[4] = r_refdef.weaponmatrix_bob[1][0];
+			vm[5] = r_refdef.weaponmatrix_bob[1][1];
+			vm[6] = r_refdef.weaponmatrix_bob[1][2];
 			vm[7] = 0;
 
-			vm[8] = r_refdef.playerview->vw_axis[2][0];
-			vm[9] = r_refdef.playerview->vw_axis[2][1];
-			vm[10] = r_refdef.playerview->vw_axis[2][2];
+			vm[8] = r_refdef.weaponmatrix_bob[2][0];
+			vm[9] = r_refdef.weaponmatrix_bob[2][1];
+			vm[10] = r_refdef.weaponmatrix_bob[2][2];
 			vm[11] = 0;
 
-			vm[12] = r_refdef.playerview->vw_origin[0];
-			vm[13] = r_refdef.playerview->vw_origin[1];
-			vm[14] = r_refdef.playerview->vw_origin[2];
+			vm[12] = r_refdef.weaponmatrix_bob[3][0];
+			vm[13] = r_refdef.weaponmatrix_bob[3][1];
+			vm[14] = r_refdef.weaponmatrix_bob[3][2];
 			vm[15] = 1;
 		}
 
@@ -3309,7 +3310,7 @@ void D3D8BE_SubmitMeshes (batch_t **worldbatches, batch_t **blist, int first, in
 void D3D8BE_BaseEntTextures(void)
 {
 	batch_t *batches[SHADER_SORT_COUNT];
-	BE_GenModelBatches(batches, shaderstate.curdlight, shaderstate.mode, r_refdef.scenevis);
+	BE_GenModelBatches(batches, shaderstate.curdlight, shaderstate.mode, r_refdef.scenevis, r_refdef.sceneareas);
 	D3D8BE_SubmitMeshes(NULL, batches, SHADER_SORT_PORTAL, SHADER_SORT_SEETHROUGH+1);
 	BE_SelectEntity(&r_worldentity);
 }
@@ -3361,7 +3362,7 @@ void D3D8BE_DrawWorld (batch_t **worldbatches)
 	}
 
 	shaderstate.curdlight = NULL;
-	BE_GenModelBatches(batches, shaderstate.curdlight, BEM_STANDARD, r_refdef.scenevis);
+	BE_GenModelBatches(batches, shaderstate.curdlight, BEM_STANDARD, r_refdef.scenevis, r_refdef.sceneareas);
 
 	if (worldbatches)
 	{

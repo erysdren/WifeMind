@@ -525,7 +525,7 @@ qboolean Image_RegisterLoader(void *module, plugimageloaderfuncs_t *loader);
 
 #ifdef D3D8QUAKE
 void		D3D8_Set2D (void);
-void		D3D8_UpdateFiltering	(image_t *imagelist, int filtermip[3], int filterpic[3], int mipcap[2], float anis);
+void		D3D8_UpdateFiltering	(image_t *imagelist, int filtermip[3], int filterpic[3], int mipcap[2], float lodbias, float anis);
 qboolean	D3D8_LoadTextureMips	(texid_t tex, const struct pendingtextureinfo *mips);
 void		D3D8_DestroyTexture		(texid_t tex);
 #endif

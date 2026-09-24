@@ -34,7 +34,7 @@ qboolean D3D8_LoadTextureMips(image_t *tex, const struct pendingtextureinfo *mip
 	D3DSURFACE_DESC desc;
 	IDirect3DTexture8 *dt;
 	qboolean swap = false;
-	unsigned int blockwidth, blockheight, blockbytes = 1;
+	unsigned int blockwidth, blockheight, blockdepth, blockbytes = 1;
 
 	if (mips->type != PTI_2D)
 		return false;	//fixme: cube and volumes should work
@@ -90,7 +90,7 @@ qboolean D3D8_LoadTextureMips(image_t *tex, const struct pendingtextureinfo *mip
 	if (fmt == D3DFMT_UNKNOWN)
 		return false;
 
-	Image_BlockSizeForEncoding(mips->encoding, &blockbytes, &blockwidth, &blockheight);
+	Image_BlockSizeForEncoding(mips->encoding, &blockbytes, &blockwidth, &blockheight, &blockdepth);
 
 	if (!pD3DDev8)
 		return false;	//can happen on errors

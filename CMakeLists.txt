@@ -20,14 +20,16 @@ cmake_policy(SET CMP0072 NEW)
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0115 NEW)
 
-if(MINGW)
-	add_link_options(
-		-static
-		-static-libgcc
-		-static-libstdc++
-		-mcrtdll=msvcrt-os
-	)
-endif()
+add_link_options(
+	$<$<BOOL:${MINGW}>:-static>
+	$<$<BOOL:${MINGW}>:-static-libgcc>
+	$<$<BOOL:${MINGW}>:-static-libstdc++>
+	$<$<BOOL:${MINGW}>:-mcrtdll=msvcrt-os>
+)
+add_compile_definitions(
+	$<$<BOOL:${MINGW}>:__MSVCRT_VERSION__=0x700>
+	$<$<BOOL:${MINGW}>:_WIN32_WINNT=0x0501>
+)
 
 # options
 

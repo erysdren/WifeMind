@@ -153,6 +153,7 @@ static void D3DVID_UpdateWindowStatus (HWND hWnd)
 	POINT p;
 	RECT nr;
 	int window_width, window_height;
+	int window_x, window_y;
 	GetClientRect(hWnd, &nr);
 
 	//if its bad then we're probably minimised
@@ -1094,7 +1095,7 @@ static qboolean	(D3D8_SCR_UpdateScreen)			(void)
 	Shader_DoReload();
 
 #ifdef VM_UI
-	uimenu = UI_MenuState();
+	uimenu = q3 && q3->ui.IsRunning();
 #else
 	uimenu = 0;
 #endif
@@ -1132,7 +1133,7 @@ static qboolean	(D3D8_SCR_UpdateScreen)			(void)
 	if (topmenu && topmenu->isopaque)
 		nohud = true;
 #ifdef VM_CG
-	else if (CG_Refresh())
+	else if (q3 && q3->cg.Redraw(cl.time))
 		nohud = true;
 #endif
 #ifdef CSQC_DAT
@@ -1160,7 +1161,7 @@ static qboolean	(D3D8_SCR_UpdateScreen)			(void)
 		nohud = true;
 	}
 
-	SCR_DrawTwoDimensional(uimenu, nohud);
+	SCR_DrawTwoDimensional(nohud);
 
 	V_UpdatePalette (false);
 	Media_RecordFrame();
