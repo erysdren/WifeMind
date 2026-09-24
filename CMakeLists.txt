@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
-project(fteqw-ng
+project(WifeMind
 	DESCRIPTION "Advanced and portable idTech engine"
-	HOMEPAGE_URL "https://github.com/erysdren/fteqw"
+	HOMEPAGE_URL "https://github.com/erysdren/WifeMind"
 	LANGUAGES C CXX
 )
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
