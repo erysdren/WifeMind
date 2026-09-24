@@ -32,10 +32,10 @@
 		{
 			"name": "emscripten",
 			"displayName": "Emscripten",
-			"binaryDir": "build-emscripten",
+			"binaryDir": "${sourceDir}/build-emscripten",
 			"toolchainFile": "$env{EMSCRIPTEN_ROOT}/cmake/Modules/Platform/Emscripten.cmake",
 			"cacheVariables": {
-				"FTE_ENGINE_SDL_VERSION_MAJOR": "0",
+				"FTE_ENGINE_USE_SDL": false,
 				"FTE_PLUGINS": false,
 				"FTE_TOOLS": false,
 				"BUILD_SHARED_LIBS": false,
@@ -51,6 +51,8 @@
 		{ "name": "linux-debug", "configurePreset": "linux-debug" },
 		{ "name": "linux-release", "configurePreset": "linux-release" },
 		{ "name": "macos-debug", "configurePreset": "macos", "configuration": "Debug" },
-		{ "name": "macos-release", "configurePreset": "macos", "configuration": "Release" }
+		{ "name": "macos-release", "configurePreset": "macos", "configuration": "Release" },
+		{ "name": "emscripten-debug", "configurePreset": "emscripten", "configuration": "Debug" },
+		{ "name": "emscripten-release", "configurePreset": "emscripten", "configuration": "Release" }
 	]
 }

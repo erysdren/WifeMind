@@ -98,49 +98,46 @@ if(FTE_TOOL_HEIGHTMAPCONVERTER)
 endif()
 
 if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
-	if(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "1")
-		if(FTE_VENDOR_DEPENDENCIES)
-			message(FATAL_ERROR "Vendoring SDL 1.2 is currently unsupported")
-		else()
-			find_package(SDL REQUIRED)
+	if(FTE_ENGINE_USE_SDL)
+		if(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "1")
+			if(FTE_VENDOR_DEPENDENCIES)
+				message(FATAL_ERROR "Vendoring SDL 1.2 is currently unsupported")
+			else()
+				find_package(SDL REQUIRED)
+			endif()
+		elseif(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "2")
+			if(FTE_VENDOR_DEPENDENCIES)
+				FetchContent_Declare(SDL2
+					GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
+					GIT_TAG "release-2.32.10"
+					EXCLUDE_FROM_ALL
+					GIT_SHALLOW TRUE
+					GIT_PROGRESS TRUE
+				)
+				set(SDL_TEST_LIBRARY OFF CACHE STRING "")
+				set(SDL_SHARED OFF CACHE STRING "")
+				set(SDL_STATIC ON CACHE STRING "")
+				FetchContent_MakeAvailable(SDL2)
+			else()
+				find_package(SDL2 REQUIRED)
+			endif()
+		elseif(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "3")
+			if(FTE_VENDOR_DEPENDENCIES)
+				FetchContent_Declare(SDL3
+					GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
+					GIT_TAG "release-3.4.16"
+					EXCLUDE_FROM_ALL
+					GIT_SHALLOW TRUE
+					GIT_PROGRESS TRUE
+				)
+				set(SDL_TEST_LIBRARY OFF CACHE STRING "")
+				set(SDL_SHARED OFF CACHE STRING "")
+				set(SDL_STATIC ON CACHE STRING "")
+				FetchContent_MakeAvailable(SDL3)
+			else()
+				find_package(SDL3 REQUIRED)
+			endif()
 		endif()
-		set(FTE_ENGINE_USE_SDL TRUE)
-	elseif(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "2")
-		if(FTE_VENDOR_DEPENDENCIES)
-			FetchContent_Declare(SDL2
-				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-				GIT_TAG "release-2.32.10"
-				EXCLUDE_FROM_ALL
-				GIT_SHALLOW TRUE
-				GIT_PROGRESS TRUE
-			)
-			set(SDL_TEST_LIBRARY OFF CACHE STRING "")
-			set(SDL_SHARED OFF CACHE STRING "")
-			set(SDL_STATIC ON CACHE STRING "")
-			FetchContent_MakeAvailable(SDL2)
-		else()
-			find_package(SDL2 REQUIRED)
-		endif()
-		set(FTE_ENGINE_USE_SDL TRUE)
-	elseif(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "3")
-		if(FTE_VENDOR_DEPENDENCIES)
-			FetchContent_Declare(SDL3
-				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-				GIT_TAG "release-3.4.12"
-				EXCLUDE_FROM_ALL
-				GIT_SHALLOW TRUE
-				GIT_PROGRESS TRUE
-			)
-			set(SDL_TEST_LIBRARY OFF CACHE STRING "")
-			set(SDL_SHARED OFF CACHE STRING "")
-			set(SDL_STATIC ON CACHE STRING "")
-			FetchContent_MakeAvailable(SDL3)
-		else()
-			find_package(SDL3 REQUIRED)
-		endif()
-		set(FTE_ENGINE_USE_SDL TRUE)
-	else()
-		set(FTE_ENGINE_USE_SDL FALSE)
 	endif()
 	if(FTE_ENGINE_RENDERER STREQUAL "gl")
 		find_package(OpenGL REQUIRED)
@@ -168,29 +165,31 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 			message(WARNING "Freetype not found, TTF fonts will not render")
 		endif()
 	endif()
-	if(FTE_VENDOR_DEPENDENCIES)
-		FetchContent_Declare(Ogg
-			URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.6.tar.gz"
-			URL_HASH MD5=e2ab08345a440d32e88b2156cf499eb9
-			EXCLUDE_FROM_ALL
-			FIND_PACKAGE_ARGS
-		)
-		FetchContent_MakeAvailable(Ogg)
-		FetchContent_Declare(Vorbis
-			URL "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.gz"
-			URL_HASH MD5=9b8034da6edc1a17d18b9bc4542015c7
-			EXCLUDE_FROM_ALL
-			FIND_PACKAGE_ARGS
-		)
-		FetchContent_MakeAvailable(Vorbis)
-		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS LIBVORBISFILE_STATIC)
-	else()
-		find_package(Ogg)
-		find_package(Vorbis)
-		if(Ogg_FOUND AND Vorbis_FOUND)
-			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS)
+	if(FTE_ENGINE_USE_OGGVORBIS)
+		if(FTE_VENDOR_DEPENDENCIES)
+			FetchContent_Declare(Ogg
+				URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.6.tar.gz"
+				URL_HASH MD5=e2ab08345a440d32e88b2156cf499eb9
+				EXCLUDE_FROM_ALL
+				FIND_PACKAGE_ARGS
+			)
+			FetchContent_MakeAvailable(Ogg)
+			FetchContent_Declare(Vorbis
+				URL "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.gz"
+				URL_HASH MD5=9b8034da6edc1a17d18b9bc4542015c7
+				EXCLUDE_FROM_ALL
+				FIND_PACKAGE_ARGS
+			)
+			FetchContent_MakeAvailable(Vorbis)
+			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS LIBVORBISFILE_STATIC)
 		else()
-			message(WARNING "Ogg/Vorbis not found")
+			find_package(Ogg)
+			find_package(Vorbis)
+			if(Ogg_FOUND AND Vorbis_FOUND)
+				list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS)
+			else()
+				message(WARNING "Ogg/Vorbis not found")
+			endif()
 		endif()
 	endif()
 	if(FTE_VENDOR_DEPENDENCIES)

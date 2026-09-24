@@ -67,9 +67,11 @@ cmake_dependent_option(FTE_ENGINE_SERVER "Build server-only engine" ON FTE_ENGIN
 
 option(FTE_VENDOR_DEPENDENCIES "Vendor all thirdparty dependencies" ON)
 option(FTE_ENGINE_USE_FREETYPE "Use freetype for TTF fonts" ON)
+option(FTE_ENGINE_USE_OGGVORBIS "Use libogg/libvorbis for sounds" ON)
+option(FTE_ENGINE_USE_SDL "Use SDL for platform abstraction" ON)
 
 set(FTE_ENGINE_SDL_VERSION_MAJOR 3 CACHE STRING "Major SDL version to use for engine")
-set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 0 1 2 3)
+set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 1 2 3)
 
 set(FTE_ENGINE_RENDERER gl CACHE STRING "Renderer to use for engine")
 set_property(CACHE FTE_ENGINE_RENDERER PROPERTY STRINGS gl vk d3d d3d8 sw)
