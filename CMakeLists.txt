@@ -86,6 +86,10 @@ set(FTE_ENGINE_SERVER_NAME "fteqw-sv" CACHE STRING "Name of server binary")
 set(FTE_COMMON_OPTIONS "")
 set(FTE_COMMON_DEFINITIONS "")
 
+# debug options
+
+list(APPEND FTE_COMMON_DEFINITIONS $<$<CONFIG:Debug>:_DEBUG>)
+
 # external dependencies
 
 include(fte_dependencies)
