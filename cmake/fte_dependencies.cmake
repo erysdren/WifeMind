@@ -3,6 +3,56 @@ include(FetchContent)
 
 find_package(Math)
 
+if(FTE_ENGINE_USE_DXVK)
+	if(LINUX)
+		FetchContent_Declare(dxvk
+			URL "https://github.com/doitsujin/dxvk/releases/download/v3.1.1/dxvk-native-3.1.1-steamrt-sniper.tar.gz"
+			URL_HASH MD5=2937ab1f2726af08dec02f24c498cbde
+			EXCLUDE_FROM_ALL
+		)
+		FetchContent_MakeAvailable(dxvk)
+	elseif(WIN32)
+		FetchContent_Declare(dxvk
+			URL "https://github.com/doitsujin/dxvk/releases/download/v3.1.1/dxvk-3.1.1.tar.gz"
+			URL_HASH MD5=dfca4e1ee1399ebd365c1b1b919dc78a
+			EXCLUDE_FROM_ALL
+		)
+		FetchContent_MakeAvailable(dxvk)
+	else()
+		message(FATAL_ERROR "DXVK is not supported for this platform")
+	endif()
+	list(APPEND CMAKE_PREFIX_PATH ${dxvk_SOURCE_DIR})
+	if(FTE_ENGINE_RENDERER STREQUAL d3d8)
+		find_library(DXVK_LIBRARY
+			REQUIRED
+			NAMES
+				dxvk_d3d8
+				libdxvk_d3d8
+				d3d8
+		)
+	elseif(FTE_ENGINE_RENDERER STREQUAL d3d9)
+		find_library(DXVK_LIBRARY
+			REQUIRED
+			NAMES
+				dxvk_d3d9
+				libdxvk_d3d9
+				d3d9
+		)
+	elseif(FTE_ENGINE_RENDERER STREQUAL d3d11)
+		find_library(DXVK_LIBRARY
+			REQUIRED
+			NAMES
+				dxvk_d3d11
+				libdxvk_d3d11
+				d3d11
+		)
+	endif()
+	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_DXVK)
+	if(LINUX)
+		set(DXVK_INCLUDE_DIR "${dxvk_SOURCE_DIR}/usr/include/dxvk")
+	endif()
+endif()
+
 if(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN)
 	FetchContent_Declare(ZLIB
 		URL "https://zlib.net/zlib-1.3.2.tar.gz"

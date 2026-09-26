@@ -71,12 +71,24 @@ option(FTE_VENDOR_DEPENDENCIES "Vendor all thirdparty dependencies" ON)
 option(FTE_ENGINE_USE_FREETYPE "Use freetype for TTF fonts" ON)
 option(FTE_ENGINE_USE_OGGVORBIS "Use libogg/libvorbis for sounds" ON)
 option(FTE_ENGINE_USE_SDL "Use SDL for platform abstraction" ON)
+option(FTE_ENGINE_USE_DXVK "Use DXVK instead of Direct3D" OFF)
 
 set(FTE_ENGINE_SDL_VERSION_MAJOR 3 CACHE STRING "Major SDL version to use for engine")
 set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 1 2 3)
 
 set(FTE_ENGINE_RENDERER gl CACHE STRING "Renderer to use for engine")
 set_property(CACHE FTE_ENGINE_RENDERER PROPERTY STRINGS gl vk d3d8 d3d9 d3d11 sw)
+
+if(FTE_ENGINE_RENDERER STREQUAL d3d8 OR FTE_ENGINE_RENDERER STREQUAL d3d9 OR FTE_ENGINE_RENDERER STREQUAL d3d11)
+	set(FTE_ENGINE_RENDERER_IS_D3D TRUE)
+else()
+	set(FTE_ENGINE_RENDERER_IS_D3D FALSE)
+endif()
+
+if(NOT FTE_ENGINE_RENDERER_IS_D3D)
+	message(WARNING "Forcing DXVK off, since a Direct3D renderer was not specified")
+	set(FTE_ENGINE_USE_DXVK OFF)
+endif()
 
 set(FTE_ENGINE_CLIENT_NAME "fteqw" CACHE STRING "Name of client binary")
 set(FTE_ENGINE_SERVER_NAME "fteqw-sv" CACHE STRING "Name of server binary")

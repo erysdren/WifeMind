@@ -295,6 +295,7 @@ if(FTE_ENGINE_CLIENT)
 			${FTE_ENGINE_SERVER_DIR}
 			${FTE_ENGINE_QCLIB_DIR}
 			${FTE_ENGINE_GL_DIR}
+			$<$<AND:$<BOOL:${FTE_ENGINE_USE_DXVK}>,$<BOOL:${LINUX}>>:${DXVK_INCLUDE_DIR}>
 	)
 	target_link_libraries(fteqw
 		PRIVATE
