@@ -61,6 +61,7 @@ if(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN)
 	)
 	set(ZLIB_BUILD_SHARED OFF CACHE STRING "")
 	FetchContent_MakeAvailable(ZLIB)
+	list(APPEND CMAKE_PREFIX_PATH ${zlib_BINARY_DIR})
 	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_ZLIB)
 else()
 	set(ZLIB_USE_STATIC_LIBS ON)
@@ -224,6 +225,7 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 				FIND_PACKAGE_ARGS
 			)
 			FetchContent_MakeAvailable(Ogg)
+			list(APPEND CMAKE_PREFIX_PATH ${ogg_BINARY_DIR})
 			FetchContent_Declare(Vorbis
 				URL "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.gz"
 				URL_HASH MD5=9b8034da6edc1a17d18b9bc4542015c7
