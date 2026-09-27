@@ -1969,6 +1969,21 @@ qboolean Sys_EngineMayUpdate(void)
 #include <errno.h>
 static int QDECL Sys_StdoutWrite (struct vfsfile_s *file, const void *buffer, int bytestowrite)
 {
+#ifdef _WIN32
+	DWORD avail;
+	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (!PeekNamedPipe(output, NULL, 0, NULL, &avail, NULL))
+		return -1;	//some kind of error? EOF? Hangup? just report it as an error.
+	if (avail)
+	{
+		if (avail > bytestowrite)
+			avail = bytestowrite;
+		if (!WriteFile(output, buffer, avail, &avail, NULL))
+			return -1;
+	}
+	return avail;
+#else
+	//standard posix
 	ssize_t r = write(STDOUT_FILENO, buffer, bytestowrite);
 	if (r == 0 && bytestowrite)
 		return -1;	//eof
@@ -1979,6 +1994,7 @@ static int QDECL Sys_StdoutWrite (struct vfsfile_s *file, const void *buffer, in
 			return 0;
 	}
 	return r;
+#endif
 }
 static int QDECL Sys_StdinRead (struct vfsfile_s *file, void *buffer, int bytestoread)
 {

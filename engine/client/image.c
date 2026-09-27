@@ -1363,13 +1363,6 @@ qboolean WriteTGA(const char *filename, enum fs_relative fsroot, const qbyte *ft
 	#else
 		#define LIBPNG_LOADED() 1
 		#define PSTATIC(n) = &n
-		#ifdef _MSC_VER
-			#ifdef _WIN64
-				#pragma comment(lib, MSVCLIBSPATH "libpng64.lib")
-			#else
-				#pragma comment(lib, MSVCLIBSPATH "libpng.lib")
-			#endif
-		#endif
 	#endif
 
 #ifndef PNG_NORETURN

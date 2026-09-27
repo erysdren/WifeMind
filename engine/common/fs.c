@@ -12,7 +12,9 @@
 #include "winquake.h"
 #endif
 
-
+#ifdef _MSC_VER
+#include <io.h>
+#endif
 
 #ifdef FTE_TARGET_WEB	//for stuff that doesn't work right...
 #define FORWEB(a,b) a
@@ -8374,8 +8376,13 @@ static qboolean FS_GetBestHomeDir(ftemanifest_t *man)
 		struct stat statbuf;
 		if (stat(com_homepath, &statbuf) >= 0 && (statbuf.st_mode & S_IFMT)==S_IFDIR)
 			return true; //okay something else already created it. continue using it.
+#ifdef _MSC_VER
+		if (_access(com_gamepath, 2) < 0)
+			return true; //baesdir isn't writable, we'll need our home! use it by default.
+#else
 		if (access(com_gamepath, W_OK) < 0)
 			return true; //baesdir isn't writable, we'll need our home! use it by default.
+#endif
 		//else don't use it (unless -usehome, anyway)
 	}
 	return false;

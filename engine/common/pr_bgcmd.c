@@ -203,7 +203,7 @@ static int debuggerstacky;
 #if defined(_WIN32) && !defined(FTE_SDL) && !defined(_XBOX)
 	#include <windows.h>
 	void INS_UpdateGrabs(int fullscreen, int activeapp);
-#else
+#elif !defined(_MSC_VER)
 	#include <unistd.h>
 #endif
 
@@ -230,7 +230,7 @@ void QCLoadBreakpoints(const char *vmname, const char *progsname)
 		{
 #if defined(_WIN32) && !defined(FTE_SDL)
 			Sleep(10);
-#else
+#elif !defined(_MSC_VER)
 			usleep(10*1000);
 #endif
 #ifdef SERVERONLY
