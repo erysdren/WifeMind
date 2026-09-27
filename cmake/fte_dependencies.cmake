@@ -58,16 +58,22 @@ if(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN)
 		URL "https://zlib.net/zlib-1.3.2.tar.gz"
 		URL_HASH MD5=a1e6c958597af3c67d162995a342138a
 		EXCLUDE_FROM_ALL
+		# FIND_PACKAGE_ARGS NAMES ZLIB
+		OVERRIDE_FIND_PACKAGE
 	)
-	set(ZLIB_BUILD_SHARED OFF CACHE STRING "")
+	set(ZLIB_USE_STATIC_LIBS ON)
+	set(ZLIB_BUILD_SHARED OFF)
+	set(ZLIB_BUILD_STATIC ON)
 	FetchContent_MakeAvailable(ZLIB)
-	list(APPEND CMAKE_PREFIX_PATH ${zlib_BINARY_DIR})
+	add_library(ZLIB::ZLIB ALIAS zlibstatic)
+	set(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
+	set(ZLIB_INCLUDE_DIRS ${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
+	set(ZLIB_LIBRARY $<TARGET_FILE:zlibstatic>)
 	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_ZLIB)
 else()
 	set(ZLIB_USE_STATIC_LIBS ON)
 	find_package(ZLIB)
 	if(ZLIB_FOUND)
-		add_library(zlibstatic ALIAS ZLIB::ZLIB)
 		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_ZLIB)
 	else()
 		list(APPEND FTE_COMMON_DEFINITIONS NO_ZLIB)
@@ -83,6 +89,8 @@ if(FTE_PLUGIN_BOX3D)
 			EXCLUDE_FROM_ALL
 			GIT_SHALLOW TRUE
 			GIT_PROGRESS TRUE
+			# FIND_PACKAGE_ARGS NAMES box3d
+			OVERRIDE_FIND_PACKAGE
 		)
 		FetchContent_MakeAvailable(box3d)
 	else()
@@ -96,6 +104,8 @@ if(FTE_PLUGIN_BULLET)
 			URL "https://github.com/bulletphysics/bullet3/archive/refs/tags/2.89.tar.gz"
 			URL_HASH MD5=d239b4800ec30513879834be6fcdc376
 			EXCLUDE_FROM_ALL
+			# FIND_PACKAGE_ARGS NAMES Bullet
+			OVERRIDE_FIND_PACKAGE
 		)
 		set(BUILD_BULLET2_DEMOS OFF CACHE STRING "")
 		set(BUILD_EXTRAS OFF CACHE STRING "")
@@ -164,6 +174,8 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 					EXCLUDE_FROM_ALL
 					GIT_SHALLOW TRUE
 					GIT_PROGRESS TRUE
+					# FIND_PACKAGE_ARGS NAMES SDL2
+					OVERRIDE_FIND_PACKAGE
 				)
 				set(SDL_TEST_LIBRARY OFF CACHE STRING "")
 				set(SDL_SHARED OFF CACHE STRING "")
@@ -180,6 +192,8 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 					EXCLUDE_FROM_ALL
 					GIT_SHALLOW TRUE
 					GIT_PROGRESS TRUE
+					# FIND_PACKAGE_ARGS NAMES SDL3
+					OVERRIDE_FIND_PACKAGE
 				)
 				set(SDL_TEST_LIBRARY OFF CACHE STRING "")
 				set(SDL_SHARED OFF CACHE STRING "")
@@ -201,6 +215,8 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 				URL "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.gz"
 				URL_HASH MD5=c8333525a49e3caf08f427f1a4b01f35
 				EXCLUDE_FROM_ALL
+				# FIND_PACKAGE_ARGS NAMES Freetype
+				OVERRIDE_FIND_PACKAGE
 			)
 			FetchContent_MakeAvailable(Freetype)
 			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_FREETYPE FREETYPE_STATIC)
@@ -222,15 +238,18 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 				URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.6.tar.gz"
 				URL_HASH MD5=e2ab08345a440d32e88b2156cf499eb9
 				EXCLUDE_FROM_ALL
-				FIND_PACKAGE_ARGS
+				# FIND_PACKAGE_ARGS NAMES Ogg
+				OVERRIDE_FIND_PACKAGE
 			)
 			FetchContent_MakeAvailable(Ogg)
 			list(APPEND CMAKE_PREFIX_PATH ${ogg_BINARY_DIR})
+			set(Ogg_DIR ${ogg_BINARY_DIR})
 			FetchContent_Declare(Vorbis
 				URL "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.gz"
 				URL_HASH MD5=9b8034da6edc1a17d18b9bc4542015c7
 				EXCLUDE_FROM_ALL
-				FIND_PACKAGE_ARGS
+				# FIND_PACKAGE_ARGS NAMES Vorbis
+				OVERRIDE_FIND_PACKAGE
 			)
 			FetchContent_MakeAvailable(Vorbis)
 			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS LIBVORBISFILE_STATIC)
@@ -249,13 +268,15 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 			URL "http://prdownloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz?download"
 			URL_HASH MD5=40aaee5111ff68814d57351e68f15f29
 			EXCLUDE_FROM_ALL
+			# FIND_PACKAGE_ARGS NAMES PNG
+			OVERRIDE_FIND_PACKAGE
 		)
 		FetchContent_MakeAvailable(PNG)
+		add_library(PNG::PNG ALIAS png_static)
 		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB LIBPNG_STATIC)
 	else()
 		find_package(PNG)
 		if(PNG_FOUND)
-			add_library(png_static ALIAS PNG::PNG)
 			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB DYNAMIC_LIBPNG)
 		else()
 			message(WARNING "libpng not found, PNG images will not load")

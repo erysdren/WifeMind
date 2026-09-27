@@ -299,13 +299,13 @@ if(FTE_ENGINE_CLIENT)
 	)
 	target_link_libraries(fteqw
 		PRIVATE
-			$<TARGET_NAME_IF_EXISTS:zlibstatic>
+			${ZLIB_LIBRARIES}
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
 			$<TARGET_NAME_IF_EXISTS:freetype>
 			$<TARGET_NAME_IF_EXISTS:Ogg::ogg>
 			$<TARGET_NAME_IF_EXISTS:vorbis>
 			$<TARGET_NAME_IF_EXISTS:vorbisfile>
-			$<TARGET_NAME_IF_EXISTS:png_static>
+			$<TARGET_NAME_IF_EXISTS:PNG::PNG>
 			$<$<AND:$<BOOL:${FTE_ENGINE_USE_SDL}>,$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},1>>:SDL::SDL>
 			$<$<AND:$<BOOL:${FTE_ENGINE_USE_SDL}>,$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},2>>:SDL2::SDL2>
 			$<$<AND:$<BOOL:${FTE_ENGINE_USE_SDL}>,$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},3>>:SDL3::SDL3>
@@ -363,7 +363,7 @@ if(FTE_ENGINE_SERVER)
 	)
 	target_link_libraries(fteqw-sv
 		PRIVATE
-			$<TARGET_NAME_IF_EXISTS:zlibstatic>
+			${ZLIB_LIBRARIES}
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
 			$<$<BOOL:${WIN32}>:ws2_32>
 			$<$<BOOL:${WIN32}>:winmm>
