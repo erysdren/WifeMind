@@ -13,8 +13,8 @@ function(fte_add_tool name)
 	target_compile_definitions(${name} PRIVATE ${FTE_COMMON_DEFINITIONS})
 	set_target_properties(${name}
 		PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY ${FTE_INSTALL_PREFIX}/bin
-			RUNTIME_OUTPUT_DIRECTORY ${FTE_INSTALL_PREFIX}/bin
+			LIBRARY_OUTPUT_DIRECTORY $<1:${FTE_INSTALL_PREFIX}/bin>
+			RUNTIME_OUTPUT_DIRECTORY $<1:${FTE_INSTALL_PREFIX}/bin>
 			SUFFIX ${FTE_EXECUTABLE_SUFFIX}
 	)
 endfunction()
