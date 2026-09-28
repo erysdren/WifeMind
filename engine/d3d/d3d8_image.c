@@ -94,10 +94,24 @@ qboolean D3D8_LoadTextureMips(image_t *tex, const struct pendingtextureinfo *mip
 
 	if (!pD3DDev8)
 		return false;	//can happen on errors
-	if (FAILED(IDirect3DDevice8_CreateTexture(pD3DDev8, mips->mip[0].width, mips->mip[0].height, mips->mipcount, 0, fmt, D3DPOOL_MANAGED, &dt)))
+
+	int mipcount = mips->mipcount;
+	for (i = 1; i < mipcount; i++)
+	{	//OpenGL and Direct3D have different interpretations of mipmap sizes.
+		//OpenGL rounds up, direct3D rounds down. (d3d:3->1, gl:3->2)
+		//so if the mips are incompatible, just drop the smaller ones.
+		if (mips->mip[i].width != max(1,(mips->mip[i-1].width)>>1) ||
+			mips->mip[i].height != max(1,(mips->mip[i-1].height)>>1))
+		{
+			mipcount = i;
+			break;
+		}
+	}
+
+	if (FAILED(IDirect3DDevice8_CreateTexture(pD3DDev8, mips->mip[0].width, mips->mip[0].height, mipcount, 0, fmt, D3DPOOL_MANAGED, &dt)))
 		return false;
 
-	for (i = 0; i < mips->mipcount; i++)
+	for (i = 0; i < mipcount; i++)
 	{
 		IDirect3DTexture8_GetLevelDesc(dt, i, &desc);
 
@@ -107,7 +121,8 @@ qboolean D3D8_LoadTextureMips(image_t *tex, const struct pendingtextureinfo *mip
 			return false;
 		}
 
-		IDirect3DTexture8_LockRect(dt, i, &lock, NULL, D3DLOCK_NOSYSLOCK|D3DLOCK_DISCARD);
+		if (FAILED(IDirect3DTexture8_LockRect(dt, i, &lock, NULL, D3DLOCK_NOSYSLOCK|D3DLOCK_DISCARD)))
+			return false;
 		//can't do it in one go. pitch might contain padding or be upside down.
 		if (!mips->mip[i].data)
 			;
