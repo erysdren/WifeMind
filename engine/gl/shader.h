@@ -977,7 +977,7 @@ void D3D8BE_VBO_Finish(vbobctx_t *ctx, void *edata, size_t esize, vboarray_t *ea
 void D3D8BE_VBO_Destroy(vboarray_t *vearray, void *mem);
 void D3D8BE_Scissor(srect_t *rect);
 
-void D3D8Shader_Init(void);
+void D3D8Shader_Init(unsigned int devno, unsigned int devtype);
 void D3D8BE_Reset(qboolean before);
 void D3D8BE_Set2D(void);
 #endif

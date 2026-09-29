@@ -2642,6 +2642,8 @@ static void BE_UploadLightmaps(qboolean force)
 {
 	int i;
 	lightmapinfo_t *lm;
+	D3DFORMAT d3dfmt;
+	int pb;
 
 	for (i = 0; i < numlightmaps; i++)
 	{
@@ -2670,11 +2672,25 @@ static void BE_UploadLightmaps(qboolean force)
 			if (!TEXLOADED(lm->lightmap_texture))
 				lm->lightmap_texture = Image_CreateTexture("***lightmap***", NULL, (r_lightmap_nearest.ival?IF_NEAREST:IF_LINEAR)|IF_NOMIPMAP);
 			tex = lm->lightmap_texture->ptr;
-			if (lm->fmt != PTI_BGRA8 && lm->fmt != PTI_BGRX8)
-				continue;	//erk!
+			switch(lm->fmt)
+			{
+				case PTI_BGRX8_SRGB:
+				case PTI_BGRX8:        d3dfmt = D3DFMT_X8R8G8B8;    pb=4;    break;
+				case PTI_BGRA8_SRGB:
+				case PTI_BGRA8:        d3dfmt = D3DFMT_A8R8G8B8;    pb=4;    break;
+				case PTI_RGB565:       d3dfmt = D3DFMT_R5G6B5;      pb=2;    break;
+				case PTI_ARGB1555:     d3dfmt = D3DFMT_A1R5G5B5;    pb=2;    break;
+				case PTI_ARGB4444:     d3dfmt = D3DFMT_A4R4G4B4;    pb=2;    break;
+				case PTI_A2BGR10:      d3dfmt = D3DFMT_A2B10G10R10; pb=4;    break;
+				case PTI_L8_SRGB:
+				case PTI_L8:           d3dfmt = D3DFMT_L8;          pb=1;    break;
+				default:
+					Sys_Error("Bad lightmap format");    //best not to include fullbright hacks. just let it crash if they manage to hit the default case.
+					continue;    //err, no. broken.
+			}
 			if (!tex)
 			{
-				IDirect3DDevice8_CreateTexture(pD3DDev8, lm->width, lm->height, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &tex);
+				IDirect3DDevice8_CreateTexture(pD3DDev8, lm->width, lm->height, 1, 0, d3dfmt, D3DPOOL_MANAGED, &tex);
 				if (!tex)
 					continue;
 				lm->lightmap_texture->ptr = tex;
@@ -2690,7 +2706,7 @@ static void BE_UploadLightmaps(qboolean force)
 			IDirect3DTexture8_LockRect(tex, 0, &lock, &rect, 0);
 			for (r = 0, w = theRect->r-theRect->l; r < lightmap[i]->rectchange.b-lightmap[i]->rectchange.t; r++)
 			{
-				memcpy((char*)lock.pBits + r*lock.Pitch, lightmap[i]->lightmaps+(theRect->l+((r+theRect->t)*lm->width))*4, w*4);
+				memcpy((char*)lock.pBits + r*lock.Pitch, lightmap[i]->lightmaps+(theRect->l+((r+theRect->t)*lm->width))*pb, w*pb);
 			}
 			IDirect3DTexture8_UnlockRect(tex, 0);
 			theRect->l = lm->width;

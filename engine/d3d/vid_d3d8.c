@@ -459,7 +459,7 @@ static void resetD3D8(void)
 	IDirect3DDevice8_SetRenderState(pD3DDev8, D3DRS_LIGHTING, FALSE);
 }
 
-void D3D8Shader_Init(void)
+void D3D8Shader_Init(unsigned int devno, unsigned int devtype)
 {
 	D3DCAPS8 caps;
 
@@ -491,6 +491,54 @@ void D3D8Shader_Init(void)
 	sh_config.texfmt[PTI_ARGB1555] = true;
 	sh_config.texfmt[PTI_ARGB4444] = true;
 
+	sh_config.env_add = 1;
+
+	{
+		int i;
+		static struct {
+			unsigned int pti;
+			unsigned int d3d8;
+			unsigned int usage;
+		} fmts[] =
+		{
+#define D3DUSAGE_QUERY_FILTER 0    //not needed as a separate flag.
+//d3d has no srgb, so not listing any of those.
+//fte's formats are written as byte orders when byte aligned. d3d are 'big endian' (on little endian machines, so byte swapped). these ones are thus swapped.
+			{PTI_BGRX8,         D3DFMT_X8R8G8B8,       D3DUSAGE_QUERY_FILTER},
+			{PTI_BGRA8,         D3DFMT_A8R8G8B8,       D3DUSAGE_QUERY_FILTER},
+			{PTI_BGR8,          D3DFMT_R8G8B8,         D3DUSAGE_QUERY_FILTER},
+			{PTI_L8,            D3DFMT_L8,             D3DUSAGE_QUERY_FILTER},
+//          {PTI_A8,            D3DFMT_A8,             D3DUSAGE_QUERY_FILTER},
+			{PTI_L8A8,          D3DFMT_A8L8,           D3DUSAGE_QUERY_FILTER},
+//          {PTI_RG16,          D3DFMT_G16R16,         D3DUSAGE_QUERY_FILTER},
+//when bit aligned, fte's formats are written as hex order(so big) when its a packed format. so these should have matching order in their naming.
+			{PTI_RGB565,        D3DFMT_R5G6B5,         D3DUSAGE_QUERY_FILTER},
+//          {PTI_RGB332,        D3DFMT_R3G3B2,         D3DUSAGE_QUERY_FILTER},
+//          {PTI_ARGB8332,      D3DFMT_A8R3G3B2,       D3DUSAGE_QUERY_FILTER},
+			{PTI_ARGB1555,      D3DFMT_A1R5G5B5,       D3DUSAGE_QUERY_FILTER},
+//          {PTI_XRGB1555,      D3DFMT_X1R5G5B5,       D3DUSAGE_QUERY_FILTER},
+			{PTI_ARGB4444,      D3DFMT_A4R4G4B4,       D3DUSAGE_QUERY_FILTER},
+//          {PTI_XRGB4444,      D3DFMT_X4R4G4B4,       D3DUSAGE_QUERY_FILTER},
+			{PTI_A2BGR10,       D3DFMT_A2B10G10R10,    D3DUSAGE_QUERY_FILTER},
+
+//compressed formats are the wild west.
+			{PTI_BC1_RGB,       D3DFMT_DXT1,          D3DUSAGE_QUERY_FILTER},
+			{PTI_BC1_RGBA,      D3DFMT_DXT1,          D3DUSAGE_QUERY_FILTER},
+			{PTI_BC2_RGBA,      D3DFMT_DXT3,          D3DUSAGE_QUERY_FILTER},
+			{PTI_BC3_RGBA,      D3DFMT_DXT5,          D3DUSAGE_QUERY_FILTER},
+		};
+		for (i = 0; i < countof(fmts); i++)
+			if (SUCCEEDED(IDirect3D8_CheckDeviceFormat(pD3D, devno, devtype, d3dpp.BackBufferFormat, fmts[i].usage, D3DRTYPE_TEXTURE, fmts[i].d3d8)))
+				sh_config.texfmt[fmts[i].pti] = true;
+    }
+
+    //fixme: the engine kinda insists on rgba textures, which d3d8 often does NOT support.
+    //we currently have some swapping, so these load, just slowly.
+/*    sh_config.texfmt[PTI_RGBX8] |= sh_config.texfmt[PTI_BGRX8];
+    sh_config.texfmt[PTI_RGBA8] |= sh_config.texfmt[PTI_BGRA8];
+    sh_config.texfmt[PTI_RGBX8_SRGB] |= sh_config.texfmt[PTI_BGRX8_SRGB];
+    sh_config.texfmt[PTI_RGBA8_SRGB] |= sh_config.texfmt[PTI_BGRA8_SRGB];
+*/
 	sh_config.can_mipcap		= true;	//at creation time, I think.
 
 	IDirect3DDevice8_GetDeviceCaps(pD3DDev8, &caps);
@@ -635,7 +683,7 @@ static qboolean initD3D8Device(HWND hWnd, rendererstate_t *info, unsigned int de
 			MoveWindow(d3dpp.hDeviceWindow, rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, false);
 		}
 #endif
-		D3D8Shader_Init();
+		D3D8Shader_Init(devno, devtype);
 		return true;	//successful
 	}
 	else
