@@ -32,8 +32,10 @@ qboolean D3D8_LoadTextureMips(image_t *tex, const struct pendingtextureinfo *mip
 	D3DLOCKED_RECT lock;
 	D3DFORMAT fmt = D3DFMT_UNKNOWN;
 	D3DSURFACE_DESC desc;
-	IDirect3DTexture8 *dt;
+	IDirect3DTexture8 *srcDt;
+	IDirect3DTexture8 *dstDt;
 	qboolean swap = false;
+	HRESULT hr;
 	unsigned int blockwidth, blockheight, blockdepth, blockbytes = 1;
 
 	if (mips->type != PTI_2D)
@@ -108,21 +110,38 @@ qboolean D3D8_LoadTextureMips(image_t *tex, const struct pendingtextureinfo *mip
 		}
 	}
 
-	if (FAILED(IDirect3DDevice8_CreateTexture(pD3DDev8, mips->mip[0].width, mips->mip[0].height, mipcount, 0, fmt, D3DPOOL_MANAGED, &dt)))
+	hr = IDirect3DDevice8_CreateTexture(pD3DDev8, mips->mip[0].width, mips->mip[0].height, mipcount, 0, fmt, D3DPOOL_SYSTEMMEM, &srcDt);
+	if (hr != D3D_OK) {
+		Sys_Printf("IDirect3DDevice8_CreateTexture failed: 0x%08x\n", hr);
 		return false;
+	}
+
+	hr = IDirect3DDevice8_CreateTexture(pD3DDev8, mips->mip[0].width, mips->mip[0].height, mipcount, 0, fmt, D3DPOOL_DEFAULT, &dstDt);
+	if (hr != D3D_OK) {
+		Sys_Printf("IDirect3DDevice8_CreateTexture failed: 0x%08x\n", hr);
+		return false;
+	}
 
 	for (i = 0; i < mipcount; i++)
 	{
-		IDirect3DTexture8_GetLevelDesc(dt, i, &desc);
-
-		if (mips->mip[i].height != desc.Height || mips->mip[i].width != desc.Width)
-		{
-			IDirect3DTexture8_Release(dt);
+		hr = IDirect3DTexture8_GetLevelDesc(srcDt, i, &desc);
+		if (hr != D3D_OK) {
+			Sys_Printf("IDirect3DTexture8_GetLevelDesc failed: 0x%08x\n", hr);
 			return false;
 		}
 
-		if (FAILED(IDirect3DTexture8_LockRect(dt, i, &lock, NULL, D3DLOCK_NOSYSLOCK|D3DLOCK_DISCARD)))
+		if (mips->mip[i].height != desc.Height || mips->mip[i].width != desc.Width)
+		{
+			IDirect3DTexture8_Release(srcDt);
 			return false;
+		}
+
+		hr = IDirect3DTexture8_LockRect(srcDt, i, &lock, NULL, D3DLOCK_NOSYSLOCK|D3DLOCK_DISCARD);
+		if (hr != D3D_OK) {
+			Sys_Printf("IDirect3DTexture8_LockRect failed: 0x%08x\n", hr);
+			return false;
+		}
+
 		//can't do it in one go. pitch might contain padding or be upside down.
 		if (!mips->mip[i].data)
 			;
@@ -146,11 +165,24 @@ qboolean D3D8_LoadTextureMips(image_t *tex, const struct pendingtextureinfo *mip
 			for (y = 0, out = lock.pBits, in = mips->mip[i].data; y < mips->mip[i].height; y+=blockheight, out += lock.Pitch, in += rowbytes)
 				memcpy(out, in, rowbytes);
 		}
-		IDirect3DTexture8_UnlockRect(dt, i);
+		IDirect3DTexture8_UnlockRect(srcDt, i);
 	}
 
+	// setup dirty rect
+	IDirect3DTexture8_AddDirtyRect(srcDt, NULL);
+
+	// copy to video memory
+	hr = IDirect3DDevice8_UpdateTexture(pD3DDev8, (IDirect3DBaseTexture8*)srcDt, (IDirect3DBaseTexture8*)dstDt);
+	if (hr != D3D_OK) {
+		Sys_Printf("IDirect3DDevice8_UpdateTexture failed: 0x%08x\n", hr);
+		return false;
+	}
+
+	// delete temp texture
+	IDirect3DTexture8_Release(srcDt);
+
 	D3D8_DestroyTexture(tex);
-	tex->ptr = dt;
+	tex->ptr = dstDt;
 
 	return true;
 }
