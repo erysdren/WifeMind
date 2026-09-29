@@ -264,23 +264,25 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 			endif()
 		endif()
 	endif()
-	if(FTE_VENDOR_DEPENDENCIES)
-		FetchContent_Declare(PNG
-			URL "http://prdownloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz?download"
-			URL_HASH MD5=40aaee5111ff68814d57351e68f15f29
-			EXCLUDE_FROM_ALL
-			# FIND_PACKAGE_ARGS NAMES PNG
-			OVERRIDE_FIND_PACKAGE
-		)
-		FetchContent_MakeAvailable(PNG)
-		add_library(PNG::PNG ALIAS png_static)
-		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB LIBPNG_STATIC)
-	else()
-		find_package(PNG)
-		if(PNG_FOUND)
-			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB DYNAMIC_LIBPNG)
+	if(FTE_ENGINE_USE_PNG)
+		if(FTE_VENDOR_DEPENDENCIES)
+			FetchContent_Declare(PNG
+				URL "http://prdownloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz?download"
+				URL_HASH MD5=40aaee5111ff68814d57351e68f15f29
+				EXCLUDE_FROM_ALL
+				# FIND_PACKAGE_ARGS NAMES PNG
+				OVERRIDE_FIND_PACKAGE
+			)
+			FetchContent_MakeAvailable(PNG)
+			add_library(PNG::PNG ALIAS png_static)
+			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB LIBPNG_STATIC)
 		else()
-			message(WARNING "libpng not found, PNG images will not load")
+			find_package(PNG)
+			if(PNG_FOUND)
+				list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB DYNAMIC_LIBPNG)
+			else()
+				message(WARNING "libpng not found, PNG images will not load")
+			endif()
 		endif()
 	endif()
 	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_STBI)
