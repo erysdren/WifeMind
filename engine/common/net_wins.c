@@ -5304,14 +5304,15 @@ typedef struct ftenet_tcp_stream_s {
 
 	int fakesequence;	//TCPC_WEBSOCKETNQ
 
+#ifdef MVD_RECORDING
+	qtvpendingstate_t qtvstate;
+#endif
+
 #ifdef HAVE_HTTPSV
 	struct
 	{
 		qboolean connection_close;
 	} httpstate;
-#ifdef MVD_RECORDING
-	qtvpendingstate_t qtvstate;
-#endif
 	struct
 	{
 		char resource[64];
