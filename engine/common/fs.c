@@ -3048,6 +3048,7 @@ vfsfile_t *QDECL FS_OpenVFS(const char *filename, const char *mode, enum fs_rela
 		{
 			if (gameonly_homedir)
 			{
+#undef CreateFile //stoopid windows.h
 				if ((*mode == 'w' && gameonly_gamedir->handle->CreateFile)
 						? gameonly_homedir->handle->CreateFile(gameonly_homedir->handle, &loc, filename)
 						: gameonly_homedir->handle->FindFile  (gameonly_homedir->handle, &loc, filename, NULL))
