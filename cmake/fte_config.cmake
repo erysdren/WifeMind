@@ -134,7 +134,7 @@ set(OMIT_QCC FALSE CACHE STRING "") #Don't include QCC
 set(NQPROT TRUE CACHE STRING "") #act as an nq client/server, with nq gamecode.
 set(HAVE_PACKET TRUE CACHE STRING "") #we can send unreliable messages!
 set(HAVE_TCP TRUE CACHE STRING "") #we can create/accept TCP connections.
-if(EMSCRIPTEN)
+if(EMSCRIPTEN OR KOS)
 	set(HAVE_GNUTLS FALSE CACHE STRING "") #on linux
 	set(HAVE_WINSSPI FALSE CACHE STRING "") #on windows
 elseif(WIN32)
