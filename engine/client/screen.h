@@ -286,6 +286,18 @@ typedef enum uploadfmt
 	PTI_WHOLEFILE,
 #endif
 
+#ifdef PVRQUAKE
+	//dreamcast pvr specific formats
+	PTI_ARGB1555_VQ, //16bit alpha format, vq compressed
+	PTI_RGB565_VQ, //16bit format, vq compressed
+	PTI_ARGB4444_VQ, //16bit alpha format, vq compressed
+	PTI_ARGB1555_TWIDDLED, //16bit alpha format, twiddled
+	PTI_RGB565_TWIDDLED, //16bit format, twiddled
+	PTI_ARGB4444_TWIDDLED, //16bit alpha format, twiddled
+	PTI_P4_TWIDDLED, //4-bit paletted, twiddled
+	PTI_P8_TWIDDLED, //8-bit paletted, twiddled
+#endif
+
 	PTI_MAX,
 
 	TF_INVALID = PTI_INVALID,
