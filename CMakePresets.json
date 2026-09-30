@@ -41,7 +41,7 @@
 				"BUILD_SHARED_LIBS": false,
 				"FTE_VENDOR_DEPENDENCIES": false,
 				"FTE_ENGINE_SERVER": false,
-				"FTE_ENGINE_CLIENT": false
+				"FTE_ENGINE_CLIENT": true
 			}
 		}
 	],
