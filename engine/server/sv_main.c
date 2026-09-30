@@ -6582,8 +6582,10 @@ static void SV_CheckMapless(int iarg, void *data)
 	static int wtf;
 	if (sv.state != ss_dead)
 		return;	//yay, the situation got resolved!
+#ifdef WEBCLIENT
 	else if (HTTP_CL_GetActiveDownloads())
 		;	//we still have hope. check again later.
+#endif
 	else
 	{
 #ifdef PACKAGEMANAGER

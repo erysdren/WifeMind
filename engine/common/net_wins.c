@@ -59,7 +59,7 @@ FTE_ALIGN(4) qbyte		net_message_buffer[MAX_OVERALLMSGLEN];
 	WSADATA		winsockdata;
 #endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) && defined(HAVE_PACKET)
 	#define getaddrinfo pgetaddrinfo
 	#define freeaddrinfo pfreeaddrinfo
 	#define getnameinfo pgetnameinfo

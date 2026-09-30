@@ -1197,7 +1197,7 @@ void CL_RecordMap_f (void)
 
 	COM_FileExtension(demoname, demoext, sizeof(demoext));
 
-#if defined(AVAIL_GZDEC) && !defined(CLIENTONLY)
+#if defined(AVAIL_GZDEC) && !defined(CLIENTONLY) && defined(MVD_RECORDING)
 	{
 		extern cvar_t sv_demoAutoCompress;
 		if (sv_demoAutoCompress.ival)
