@@ -5110,6 +5110,20 @@ qboolean Image_WriteKTXFile(const char *filename, enum fs_relative fsroot, struc
 	case PTI_DEPTH32:			header.glinternalformat = 0x81A7/*GL_DEPTH_COMPONENT32*/;	header.glbaseinternalformat = 0x1902/*GL_DEPTH_COMPONENT*/;	header.glformat = 0x1902/*GL_DEPTH_COMPONENT*/;	header.gltype = 0x1406/*GL_FLOAT*/;							header.gltypesize = 4; break;
 	case PTI_DEPTH24_8:			header.glinternalformat = 0x88F0/*GL_DEPTH24_STENCIL8*/;	header.glbaseinternalformat = 0x84F9/*GL_DEPTH_STENCIL*/;	header.glformat = 0x84F9/*GL_DEPTH_STENCIL*/;	header.gltype = 0x84FA/*GL_UNSIGNED_INT_24_8*/;				header.gltypesize = 4; break;
 
+#ifdef PVRQUAKE
+	case PTI_ARGB1555_VQ:
+	case PTI_ARGB1555_TWIDDLED:
+	case PTI_ARGB1555_VQ_TWIDDLED:
+	case PTI_RGB565_VQ:
+	case PTI_RGB565_TWIDDLED:
+	case PTI_RGB565_VQ_TWIDDLED:
+	case PTI_ARGB4444_VQ:
+	case PTI_ARGB4444_TWIDDLED:
+	case PTI_ARGB4444_VQ_TWIDDLED:
+	case PTI_P4_TWIDDLED:
+	case PTI_P8_TWIDDLED:
+#endif
+
 #ifdef FTE_TARGET_WEB
 	case PTI_WHOLEFILE:
 #endif
@@ -6942,6 +6956,20 @@ qboolean Image_WriteDDSFile(const char *filename, enum fs_relative fsroot, struc
 	case PTI_BGR8_SRGB:			return false;	//unsupported
 	case PTI_DEPTH24:			return false;	//unsupported, should fall back on dx9 formats.
 	case PTI_P8:				return false;	//unsupported, technically R8_UNORM but would load back in wrongly.
+
+#ifdef PVRQUAKE
+	case PTI_ARGB1555_VQ:
+	case PTI_ARGB1555_TWIDDLED:
+	case PTI_ARGB1555_VQ_TWIDDLED:
+	case PTI_RGB565_VQ:
+	case PTI_RGB565_TWIDDLED:
+	case PTI_RGB565_VQ_TWIDDLED:
+	case PTI_ARGB4444_VQ:
+	case PTI_ARGB4444_TWIDDLED:
+	case PTI_ARGB4444_VQ_TWIDDLED:
+	case PTI_P4_TWIDDLED:
+	case PTI_P8_TWIDDLED:
+#endif
 
 #ifdef FTE_TARGET_WEB
 	case PTI_WHOLEFILE:
@@ -13380,6 +13408,19 @@ static qboolean Image_GenMip0(struct pendingtextureinfo *mips, unsigned int flag
 		case PTI_ASTC_6X6X6_HDR:
 		case PTI_ASTC_6X6X6_SRGB:
 		case PTI_ASTC_6X6X6_LDR:
+#endif
+#ifdef PVRQUAKE
+		case PTI_ARGB1555_VQ:
+		case PTI_ARGB1555_TWIDDLED:
+		case PTI_ARGB1555_VQ_TWIDDLED:
+		case PTI_RGB565_VQ:
+		case PTI_RGB565_TWIDDLED:
+		case PTI_RGB565_VQ_TWIDDLED:
+		case PTI_ARGB4444_VQ:
+		case PTI_ARGB4444_TWIDDLED:
+		case PTI_ARGB4444_VQ_TWIDDLED:
+		case PTI_P4_TWIDDLED:
+		case PTI_P8_TWIDDLED:
 #endif
 #ifdef FTE_TARGET_WEB
 		case PTI_WHOLEFILE:
