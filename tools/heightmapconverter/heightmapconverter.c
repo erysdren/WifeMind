@@ -24,10 +24,6 @@ qboolean VARGS Q_snprintfz(char *dest, size_t size, const char *fmt, ...)
 	ret = vsnprintf (dest, size, fmt, argptr);
 #endif
 	va_end (argptr);
-#ifdef _DEBUG
-	if (ret>=size)
-		Sys_Error("Q_vsnprintfz: Truncation\n");
-#endif
 	//if ret is -1 (windows oversize, or general error) then it'll be treated as unsigned so really long. this makes the following check quite simple.
 	return ret>=size;
 }
