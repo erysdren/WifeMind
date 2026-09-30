@@ -139,6 +139,7 @@
 #cmakedefine ENGINE_ROUTING			//Engine-provided routing logic (possibly threaded)
 #cmakedefine USE_INTERNAL_BULLET	//Statically link against bullet physics plugin (instead of using an external plugin)
 #cmakedefine USE_INTERNAL_ODE		//Statically link against ode physics plugin (instead of using an external plugin)
+#cmakedefine OMIT_QCC @OMIT_QCC@	//Don't include QCC
 
 // Networking options
 #cmakedefine NQPROT					//act as an nq client/server, with nq gamecode.
@@ -154,6 +155,7 @@
 #cmakedefine SUPPORT_ICE			//Internet Connectivity Establishment, for use by plugins to establish voice or game connections.
 #cmakedefine CL_MASTER				//Clientside Server Browser functionality.
 #cmakedefine PACKAGEMANAGER			//Allows the user to enable/disable/download(with WEBCLIENT) packages and plugins. Also handles map packages.
+#cmakedefine MAX_CLIENTS @MAX_CLIENTS@
 
 // Audio Drivers
 #cmakedefine AVAIL_OPENAL			//

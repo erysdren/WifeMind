@@ -128,6 +128,7 @@ set(MVD_RECORDING TRUE CACHE STRING "") #server can record MVDs.
 set(ENGINE_ROUTING TRUE CACHE STRING "") #Engine-provided routing logic (possibly threaded)
 set(USE_INTERNAL_BULLET FALSE CACHE STRING "") #Statically link against bullet physics plugin (instead of using an external plugin)
 set(USE_INTERNAL_ODE FALSE CACHE STRING "") #Statically link against ode physics plugin (instead of using an external plugin)
+set(OMIT_QCC FALSE CACHE STRING "") #Don't include QCC
 
 # Networking options
 set(NQPROT TRUE CACHE STRING "") #act as an nq client/server, with nq gamecode.
@@ -151,6 +152,7 @@ set(IRCCONNECT FALSE CACHE STRING "") #lame support for routing game packets via
 set(SUPPORT_ICE TRUE CACHE STRING "") #Internet Connectivity Establishment, for use by plugins to establish voice or game connections.
 set(CL_MASTER TRUE CACHE STRING "") #Clientside Server Browser functionality.
 set(PACKAGEMANAGER TRUE CACHE STRING "") #Allows the user to enable/disable/download(with WEBCLIENT) packages and plugins. Also handles map packages.
+set(MAX_CLIENTS 255 CACHE STRING "")
 
 # Audio Drivers
 set(AVAIL_OPENAL TRUE CACHE STRING "") #
