@@ -262,9 +262,10 @@ static ALC_API void*           (ALC_APIENTRY *palcGetProcAddress)(ALCdevice *dev
 //#include "AL/al.h"
 //#include "AL/alext.h"
 
+static void           (ALC_APIENTRY *palcGetIntegerv)( ALCdevice *device, ALCenum param, ALCsizei size, ALCint *data );
+
 #if defined(VOICECHAT)
 //capture-specific stuff
-static void           (ALC_APIENTRY *palcGetIntegerv)( ALCdevice *device, ALCenum param, ALCsizei size, ALCint *data );
 static ALCdevice *    (ALC_APIENTRY *palcCaptureOpenDevice)( const ALCchar *devicename, ALCuint frequency, ALCenum format, ALCsizei buffersize );
 static ALCboolean     (ALC_APIENTRY *palcCaptureCloseDevice)( ALCdevice *device );
 static void           (ALC_APIENTRY *palcCaptureStart)( ALCdevice *device );
