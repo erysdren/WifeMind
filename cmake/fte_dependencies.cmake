@@ -53,7 +53,11 @@ if(FTE_ENGINE_USE_DXVK)
 	endif()
 endif()
 
-if(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN)
+if(NXDK)
+	cmake_pkg_config(IMPORT zlib REQUIRED)
+	set(ZLIB_LIBRARY PkgConfig::zlib)
+	set(ZLIB_LIBRARIES PkgConfig::zlib)
+elseif(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN)
 	FetchContent_Declare(ZLIB
 		URL "https://zlib.net/zlib-1.3.2.tar.gz"
 		URL_HASH MD5=a1e6c958597af3c67d162995a342138a

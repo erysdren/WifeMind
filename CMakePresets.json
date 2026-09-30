@@ -43,6 +43,22 @@
 				"FTE_ENGINE_SERVER": false,
 				"FTE_ENGINE_CLIENT": true
 			}
+		},
+		{
+			"name": "nxdk",
+			"displayName": "NXDK",
+			"binaryDir": "${sourceDir}/build-nxdk",
+			"toolchainFile": "$env{NXDK_DIR}/share/toolchain-nxdk.cmake",
+			"cacheVariables": {
+				"FTE_ENGINE_USE_SDL": false,
+				"FTE_PLUGINS": false,
+				"FTE_TOOLS": false,
+				"BUILD_SHARED_LIBS": false,
+				"FTE_VENDOR_DEPENDENCIES": false,
+				"FTE_ENGINE_SERVER": false,
+				"FTE_ENGINE_CLIENT": true,
+				"FTE_ENGINE_RENDERER": "d3d8"
+			}
 		}
 	],
 	"buildPresets": [
@@ -53,6 +69,8 @@
 		{ "name": "macos-debug", "configurePreset": "macos", "configuration": "Debug" },
 		{ "name": "macos-release", "configurePreset": "macos", "configuration": "Release" },
 		{ "name": "emscripten-debug", "configurePreset": "emscripten", "configuration": "Debug" },
-		{ "name": "emscripten-release", "configurePreset": "emscripten", "configuration": "Release" }
+		{ "name": "emscripten-release", "configurePreset": "emscripten", "configuration": "Release" },
+		{ "name": "nxdk-debug", "configurePreset": "nxdk", "configuration": "Debug" },
+		{ "name": "nxdk-release", "configurePreset": "nxdk", "configuration": "Release" }
 	]
 }
