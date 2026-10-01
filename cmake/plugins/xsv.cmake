@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_XSV)
 endif()
 
 fte_add_plugin(xsv
+	TITLE "X11 Server Plugin"
+	DESCRIPTION "Provides a primitive X11 server in the form of a video decoder plugin."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/xsv/m_x.c
 		${FTE_PLUGINS_ROOT_DIR}/xsv/x_reqs.c

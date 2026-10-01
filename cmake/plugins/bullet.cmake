@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_BULLET)
 endif()
 
 fte_add_plugin(bullet
+	TITLE "Bullet Physics Plugin"
+	DESCRIPTION "Provides Rigid Body Physics."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/bullet/bulletplug.cpp
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

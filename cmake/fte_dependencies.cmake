@@ -159,6 +159,13 @@ if(FTE_PLUGIN_OPENXR)
 	endif()
 endif()
 
+if(FTE_PLUGIN_OPENSSL)
+	cmake_pkg_config(IMPORT openssl)
+	if(NOT PKGCONFIG_openssl_FOUND)
+		set(FTE_PLUGIN_OPENSSL OFF)
+	endif()
+endif()
+
 if(FTE_TOOL_HEIGHTMAPCONVERTER)
 	FetchContent_Declare(inih
 		GIT_REPOSITORY "https://github.com/benhoyt/inih.git"

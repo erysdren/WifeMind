@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_IRC)
 endif()
 
 fte_add_plugin(irc
+	TITLE "IRC Plugin"
+	DESCRIPTION "Allows you to chat on IRC without tabbing out."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/irc/ircclient.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

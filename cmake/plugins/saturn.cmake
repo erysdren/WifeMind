@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_SATURN)
 endif()
 
 fte_add_plugin(saturn
+	TITLE "Saturn Plugin"
+	DESCRIPTION "Support for Sega Saturn Quake formats."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/saturn/saturn.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

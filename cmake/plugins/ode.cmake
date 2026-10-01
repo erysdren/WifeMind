@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_ODE)
 endif()
 
 fte_add_plugin(ode
+	TITLE "ODE Physics"
+	DESCRIPTION "Provides Rigid Body Physics behaviours."
 	SOURCES
 		${FTE_ENGINE_COMMON_DIR}/com_phys_ode.c
 		${FTE_ENGINE_COMMON_DIR}/mathlib.c

@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_NARBDROP)
 endif()
 
 fte_add_plugin(narbdrop
+	TITLE "NarbDrop Plugin"
+	DESCRIPTION "Support for Narbacular Drop formats."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/narbdrop/fs_ore.c
 		${FTE_PLUGINS_ROOT_DIR}/narbdrop/mod_cmf.c

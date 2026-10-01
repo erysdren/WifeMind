@@ -20,7 +20,7 @@ ENDFUNCTION()
 endif()
 
 function(fte_add_plugin name)
-	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "" "SOURCES;INCLUDE_DIRECTORIES;DEPENDENCIES;COMPILE_DEFINITIONS")
+	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "TITLE;DESCRIPTION;GAMEDIR" "SOURCES;INCLUDE_DIRECTORIES;DEPENDENCIES;COMPILE_DEFINITIONS")
 	set(target fteplug_${name})
 	add_library(${target} SHARED ${ARG_SOURCES})
 	fte_add_common(${target})
@@ -47,21 +47,25 @@ function(fte_add_plugin name)
 			RUNTIME_OUTPUT_DIRECTORY $<1:${FTE_INSTALL_PREFIX}>
 			SUFFIX ${FTE_SHARED_LIBRARY_SUFFIX}
 			PREFIX ""
-			TITLE "title"
-			DESCRIPTION "description"
+			FTEPLUG_NAME "fte${name}"
+			FTEPLUG_TITLE "${ARG_TITLE}"
+			FTEPLUG_DESCRIPTION "${ARG_DESCRIPTION}"
+			FTEPLUG_VERSION "${FTE_SVNREVISION}"
+			FTEPLUG_GAMEDIR "${ARG_GAMEDIR}"
+			FTEPLUG_CATEGORY "Plugins"
 	)
 	add_custom_command(
 		TARGET ${target} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E echo
 [[{
-	package $<TARGET_PROPERTY:NAME>
-	ver "${FTE_SVNREVISION}"
-	category Plugins
-	title "$<TARGET_PROPERTY:TITLE>"
-	gamedir ""
-	desc "$<TARGET_PROPERTY:DESCRIPTION>"
+	package $<TARGET_PROPERTY:FTEPLUG_NAME>
+	ver "$<TARGET_PROPERTY:FTEPLUG_VERSION>"
+	category $<TARGET_PROPERTY:FTEPLUG_CATEGORY>
+	title "$<TARGET_PROPERTY:FTEPLUG_TITLE>"
+	gamedir "$<TARGET_PROPERTY:FTEPLUG_GAMEDIR>"
+	desc "$<TARGET_PROPERTY:FTEPLUG_DESCRIPTION>"
 }]] > "$<TARGET_FILE:${target}>.info"
-		COMMAND ${CMAKE_COMMAND} -E rm "$<TARGET_FILE:${target}>.info"
+		# COMMAND ${CMAKE_COMMAND} -E rm "$<TARGET_FILE:${target}>.info"
 		VERBATIM
 	)
 endfunction()

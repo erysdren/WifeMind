@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_HL2)
 endif()
 
 fte_add_plugin(hl2
+	TITLE "HalfLife2 Formats Plugin"
+	DESCRIPTION "Adds support for reading various file formats used by HalfLife2. Requires mod support to be useful."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/hl2/fs_vpk.c
 		${FTE_PLUGINS_ROOT_DIR}/hl2/fs_vpk_vtmb.c

@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_OPENXR)
 endif()
 
 fte_add_plugin(openxr
+	TITLE "OpenXR Plugin"
+	DESCRIPTION "Provides support for Virtual Reality headsets and input devices."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/openxr.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

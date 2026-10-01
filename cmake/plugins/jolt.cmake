@@ -3,6 +3,8 @@ if(NOT FTE_PLUGIN_JOLT)
 endif()
 
 fte_add_plugin(jolt
+	TITLE "Jolt Physics Plugin"
+	DESCRIPTION "Adds a rigidbody physics engine."
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/jolt/jolt.cpp
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c
