@@ -77,7 +77,7 @@ endif()
 set(FTE_ENGINE_CLIENT_NAME "fteqw" CACHE STRING "Name of client binary")
 set(FTE_ENGINE_SERVER_NAME "fteqw-sv" CACHE STRING "Name of server binary")
 
-# compile options
+# common options
 
 set(FTE_COMMON_LINK_OPTIONS "")
 set(FTE_COMMON_OPTIONS "")
