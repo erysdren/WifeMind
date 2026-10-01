@@ -422,4 +422,4 @@ qbyte *ReadICOFile(const char *fname, qbyte *buf, int length, int *width, int *h
 	return NULL;
 }
 
-#endif
+#endif // IMAGEFMT_BMP

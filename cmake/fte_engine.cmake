@@ -135,7 +135,13 @@ set(FTE_ENGINE_CLIENT_SOURCES
 	${FTE_ENGINE_CLIENT_DIR}/console.c
 	${FTE_ENGINE_CLIENT_DIR}/image.c
 	${FTE_ENGINE_CLIENT_DIR}/image_bmp.c
+	${FTE_ENGINE_CLIENT_DIR}/image_hdr.c
+	${FTE_ENGINE_CLIENT_DIR}/image_pbm.c
+	${FTE_ENGINE_CLIENT_DIR}/image_pcx.c
+	${FTE_ENGINE_CLIENT_DIR}/image_psd.c
 	${FTE_ENGINE_CLIENT_DIR}/image_pvr.c
+	${FTE_ENGINE_CLIENT_DIR}/image_tga.c
+	${FTE_ENGINE_CLIENT_DIR}/image_xcf.c
 	${FTE_ENGINE_CLIENT_DIR}/keys.c
 	${FTE_ENGINE_CLIENT_DIR}/menu.c
 	${FTE_ENGINE_CLIENT_DIR}/m_master.c
