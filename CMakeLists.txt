@@ -107,6 +107,9 @@ list(APPEND FTE_COMMON_DEFINITIONS
 	$<$<BOOL:${KOS}>:__DREAMCAST__>
 	$<$<BOOL:${MINGW}>:__MSVCRT_VERSION__=0x200> # was 0x700
 	$<$<BOOL:${MINGW}>:_WIN32_WINNT=0x0500> # was 0x0501
+	# kindve a hack
+	ARCH_CPU_POSTFIX=\"\"
+	ARCH_DL_POSTFIX=\"${FTE_SHARED_LIBRARY_SUFFIX}\"
 )
 
 # external dependencies
