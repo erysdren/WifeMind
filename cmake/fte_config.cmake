@@ -9,7 +9,7 @@ set(BRANDING_ICON "fte_eukara.ico" CACHE STRING "") #The file to use in windows'
 # filesystem rebranding
 set(GAME_SHORTNAME "quake" CACHE STRING "") #short alphanumeric description
 set(GAME_FULLNAME "${FULLENGINENAME}" CACHE STRING "") #full name of the game we're playing
-set(GAME_BASEGAMES FALSE CACHE STRING "") #comma-separate list of basegame strings to use
+set(GAME_BASEGAMES "id1" CACHE STRING "") #comma-separate list of basegame strings to use
 set(GAME_PROTOCOL "FTE-Quake" CACHE STRING "") #so other games won't show up in the server browser
 set(GAME_DEFAULTPORT "27500" CACHE STRING "") #slightly reduces the chance of people connecting to the wrong type of server
 set(GAME_IDENTIFYINGFILES FALSE CACHE STRING "") #with multiple games, this string-list gives verification that the basedir is actually valid. if null, will just be assumed correct.
