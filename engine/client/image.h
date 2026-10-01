@@ -17,6 +17,19 @@ qboolean WriteBMPFile(char *filename, enum fs_relative fsroot, qbyte *in, qintpt
 qbyte *ReadICOFile(const char *fname, qbyte *buf, int length, int *width, int *height, uploadfmt_t *fmt);
 #endif
 
+#ifdef IMAGEFMT_EXR
+// image_exr.c
+void InitLibrary_OpenEXR(void);
+qboolean OpenEXR_IsLibraryLoaded(void);
+void *ReadEXRFile(qbyte *buf, size_t len, const char *fname, int *outwidth, int *outheight, uploadfmt_t *outformat);
+#endif
+
+#ifdef IMAGEFMT_KTX
+// image_ktx.c
+qboolean Image_WriteKTXFile(const char *filename, enum fs_relative fsroot, struct pendingtextureinfo *mips);
+struct pendingtextureinfo *Image_ReadKTXFile(unsigned int flags, const char *fname, qbyte *filedata, size_t filesize);
+#endif
+
 #ifdef IMAGEFMT_HDR
 // image_hdr.c
 void *ReadRadianceFile(qbyte *buf, size_t len, const char *fname, int *width, int *height, uploadfmt_t *format);
