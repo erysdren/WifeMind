@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(namemaker
 	TITLE "Name Maker Plugin"
 	DESCRIPTION "Provides a lame UI for selecting arbitrary non-ascii glyphs as part of your nickname."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/namemaker/namemaker.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

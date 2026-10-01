@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(rott
 	TITLE "Rott Plugin"
 	DESCRIPTION "Support for Rise of the Triad formats."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/rott/fs_rott.c
 		${FTE_PLUGINS_ROOT_DIR}/rott/mod_rott.c

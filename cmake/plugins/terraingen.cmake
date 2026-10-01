@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(terraingen
 	TITLE "TerrainGen Plugin"
 	DESCRIPTION "A lame example plugin for randomised terrain generation."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/terrorgen/terragen.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

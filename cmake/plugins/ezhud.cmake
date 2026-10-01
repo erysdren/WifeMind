@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(ezhud
 	TITLE "EzHud Plugin"
 	DESCRIPTION "Provides compat with ezquake's hud scripts."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/ezhud/ezquakeisms.c
 		${FTE_PLUGINS_ROOT_DIR}/ezhud/hud.c

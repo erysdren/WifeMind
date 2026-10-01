@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(mpq
 	TITLE "MPQ Archive Plugin"
 	DESCRIPTION "Adds support for reading .mpq files. Not very useful..."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/mpq/blast.c
 		${FTE_PLUGINS_ROOT_DIR}/mpq/fs_mpq.c

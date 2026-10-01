@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(xmpp
 	TITLE "XMPP Plugin"
 	DESCRIPTION "XMPP/Jabber instant messenger plugin for chatting without tabbing out."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/jabber/jabberclient.c
 		${FTE_PLUGINS_ROOT_DIR}/jabber/jingle.c

@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(cod
 	TITLE "CoD Formats"
 	DESCRIPTION "Provides compatability with Call Of Duty's file formats."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/cod/codmod.c
 		${FTE_PLUGINS_ROOT_DIR}/cod/codbsp.c

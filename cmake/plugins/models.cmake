@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(models
 	TITLE "Models Plugin"
 	DESCRIPTION "Kinda redundant now that the engine has gltf2 loading."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/models/models.c
 		${FTE_PLUGINS_ROOT_DIR}/models/gltf.c

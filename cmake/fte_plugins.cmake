@@ -20,7 +20,7 @@ ENDFUNCTION()
 endif()
 
 function(fte_add_plugin name)
-	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "TITLE;DESCRIPTION;GAMEDIR" "SOURCES;INCLUDE_DIRECTORIES;DEPENDENCIES;COMPILE_DEFINITIONS")
+	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "TITLE;DESCRIPTION;GAMEDIR;CATEGORY" "SOURCES;INCLUDE_DIRECTORIES;DEPENDENCIES;COMPILE_DEFINITIONS")
 	set(target fteplug_${name})
 	add_library(${target} SHARED ${ARG_SOURCES})
 	fte_add_common(${target})
@@ -52,7 +52,7 @@ function(fte_add_plugin name)
 			FTEPLUG_DESCRIPTION "${ARG_DESCRIPTION}"
 			FTEPLUG_VERSION "${FTE_SVNREVISION}"
 			FTEPLUG_GAMEDIR "${ARG_GAMEDIR}"
-			FTEPLUG_CATEGORY "Plugins"
+			FTEPLUG_CATEGORY "${ARG_CATEGORY}"
 	)
 	add_custom_command(
 		TARGET ${target} POST_BUILD

@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(box3d
 	TITLE "Box3D Physics Plugin"
 	DESCRIPTION "Adds a rigidbody physics engine."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/box3d/box3d.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

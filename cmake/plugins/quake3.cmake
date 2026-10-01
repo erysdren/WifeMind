@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(quake3
 	TITLE "Quake3 Compat"
 	DESCRIPTION "Provides compatability with Quake3's gamecode."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_bspq3.c
 		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_cluster.c

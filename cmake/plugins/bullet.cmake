@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(bullet
 	TITLE "Bullet Physics Plugin"
 	DESCRIPTION "Provides Rigid Body Physics."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/bullet/bulletplug.cpp
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c

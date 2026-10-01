@@ -5,6 +5,7 @@ endif()
 fte_add_plugin(openssl
 	TITLE "OpenSSL"
 	DESCRIPTION "Provides OpenSSL support for dtls/tls/https support. The crypto library that is actually used is controlled via the tls_provider cvar."
+	CATEGORY "Plugins"
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/net_ssl_openssl.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c
