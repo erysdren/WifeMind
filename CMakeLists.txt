@@ -20,10 +20,6 @@ cmake_policy(SET CMP0072 NEW)
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0115 NEW)
 
-
-add_compile_definitions(
-)
-
 # options
 
 include(CMakeDependentOption)
