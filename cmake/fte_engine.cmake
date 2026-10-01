@@ -301,6 +301,7 @@ if(FTE_ENGINE_CLIENT)
 			$<$<BOOL:${EMSCRIPTEN}>:FTE_TARGET_WEB>
 			$<$<BOOL:${EMSCRIPTEN}>:OMIT_QCC>
 			$<$<BOOL:${EMSCRIPTEN}>:GL_STATIC>
+			$<$<BOOL:${FTE_ENGINE_USE_DXVK}>:AVAIL_DXVK>
 	)
 	target_include_directories(fteqw
 		PRIVATE
