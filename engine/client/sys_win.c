@@ -1696,6 +1696,12 @@ void VARGS Sys_Printf (char *fmt, ...)
 	char		text[4096];
 	DWORD		dummy;
 
+#ifdef _DEBUG
+	va_start (argptr,fmt);
+	vfprintf(stdout, fmt, argptr);
+	va_end (argptr);
+#endif
+
 	conchar_t msg[4096], *end, *in;
 	wchar_t wide[4096], *out;
 	int wlen;

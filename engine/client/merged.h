@@ -232,7 +232,7 @@ enum
 typedef struct image_s
 {
 #ifdef _DEBUG
-	char dbgident[32];
+	char dbgident[MAX_QPATH];
 #endif
 	char *ident;	//allocated on end
 	char *subpath;	//allocated on end
