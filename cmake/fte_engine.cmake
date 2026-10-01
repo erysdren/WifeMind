@@ -271,6 +271,10 @@ if(FTE_ENGINE_CLIENT)
 			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-O0>
 			$<$<AND:$<BOOL:${EMSCRIPTEN}>,$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-gsource-map>
 	)
+	target_link_options(fteqw
+		PRIVATE
+			${FTE_COMMON_LINK_OPTIONS}
+	)
 	target_compile_definitions(fteqw
 		PRIVATE
 			${FTE_COMMON_DEFINITIONS}
@@ -348,7 +352,14 @@ if(FTE_ENGINE_SERVER)
 		${FTE_ENGINE_PROGS_SOURCES}
 		${FTE_ENGINE_SERVER_ONLY_SOURCES}
 	)
-	target_compile_options(fteqw-sv PRIVATE ${FTE_COMMON_OPTIONS})
+	target_compile_options(fteqw-sv
+		PRIVATE
+			${FTE_COMMON_OPTIONS}
+	)
+	target_link_options(fteqw-sv
+		PRIVATE
+			${FTE_COMMON_LINK_OPTIONS}
+	)
 	target_compile_definitions(fteqw-sv
 		PRIVATE
 			SERVERONLY
@@ -393,7 +404,14 @@ if(0)
 		${FTE_ENGINE_CLIENT_D3D_SOURCES}
 		${FTE_ENGINE_CLIENT_SW_SOURCES}
 	)
-	target_compile_options(fteqw-cl PRIVATE ${FTE_COMMON_OPTIONS})
+	target_compile_options(fteqw-cl
+		PRIVATE
+			${FTE_COMMON_OPTIONS}
+	)
+	target_link_options(fteqw-cl
+		PRIVATE
+			${FTE_COMMON_LINK_OPTIONS}
+	)
 	target_compile_definitions(fteqw-cl
 		PRIVATE
 			CLIENTONLY

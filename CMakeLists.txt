@@ -20,15 +20,8 @@ cmake_policy(SET CMP0072 NEW)
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0115 NEW)
 
-add_link_options(
-	$<$<BOOL:${MINGW}>:-static>
-	$<$<BOOL:${MINGW}>:-static-libgcc>
-	$<$<BOOL:${MINGW}>:-static-libstdc++>
-	$<$<BOOL:${MINGW}>:-mcrtdll=msvcrt20> # was msvcrt-os
-)
+
 add_compile_definitions(
-	$<$<BOOL:${MINGW}>:__MSVCRT_VERSION__=0x200> # was 0x700
-	$<$<BOOL:${MINGW}>:_WIN32_WINNT=0x0500> # was 0x0501
 )
 
 # options
@@ -90,12 +83,28 @@ set(FTE_ENGINE_SERVER_NAME "fteqw-sv" CACHE STRING "Name of server binary")
 
 # compile options
 
+set(FTE_COMMON_LINK_OPTIONS "")
 set(FTE_COMMON_OPTIONS "")
 set(FTE_COMMON_DEFINITIONS "")
 
-# debug options
+list(APPEND FTE_COMMON_DEFINITIONS
+	$<$<CONFIG:Debug>:_DEBUG>
+)
 
-list(APPEND FTE_COMMON_DEFINITIONS $<$<CONFIG:Debug>:_DEBUG>)
+list(APPEND FTE_COMMON_LINK_OPTIONS
+	$<$<BOOL:${MINGW}>:-static>
+	$<$<BOOL:${MINGW}>:-static-libgcc>
+	$<$<BOOL:${MINGW}>:-static-libstdc++>
+	$<$<BOOL:${MINGW}>:-mcrtdll=msvcrt20> # was msvcrt-os
+)
+
+list(APPEND FTE_COMMON_DEFINITIONS
+	$<$<BOOL:${NXDK}>:_XBOX>
+	$<$<BOOL:${KOS}>:__KOS__>
+	$<$<BOOL:${KOS}>:__DREAMCAST__>
+	$<$<BOOL:${MINGW}>:__MSVCRT_VERSION__=0x200> # was 0x700
+	$<$<BOOL:${MINGW}>:_WIN32_WINNT=0x0500> # was 0x0501
+)
 
 # external dependencies
 
