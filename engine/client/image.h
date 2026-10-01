@@ -6,7 +6,6 @@
 #include "glquake.h"
 
 // image.c
-
 float HalfToFloat(unsigned short val);
 unsigned short FloatToHalf(float val);
 
