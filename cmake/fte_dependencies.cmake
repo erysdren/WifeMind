@@ -152,6 +152,13 @@ if(FTE_PLUGIN_ODE)
 	)
 endif()
 
+if(FTE_PLUGIN_OPENXR)
+	cmake_pkg_config(IMPORT openxr)
+	if(NOT PKGCONFIG_openxr_FOUND)
+		set(FTE_PLUGIN_OPENXR OFF)
+	endif()
+endif()
+
 if(FTE_TOOL_HEIGHTMAPCONVERTER)
 	FetchContent_Declare(inih
 		GIT_REPOSITORY "https://github.com/benhoyt/inih.git"

@@ -1,10 +1,13 @@
-if(NOT FTE_PLUGIN_WINAMP OR NOT WIN32)
+if(NOT FTE_PLUGIN_WINAMP)
 	return()
 endif()
 
-fte_add_plugin(fteplug_winamp
+fte_add_plugin(winamp
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/winamp/winamp.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c
+	INCLUDE_DIRECTORIES
+		${FTE_PLUGINS_ROOT_DIR}
+		${FTE_PLUGINS_ROOT_DIR}/winamp
+		${FTE_ENGINE_CLIENT_DIR}
 )
-target_include_directories(fteplug_winamp PRIVATE ${FTE_PLUGINS_ROOT_DIR} ${FTE_PLUGINS_ROOT_DIR}/winamp ${FTE_ENGINE_CLIENT_DIR})

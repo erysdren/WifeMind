@@ -2,12 +2,21 @@ if(NOT FTE_PLUGIN_ROTT)
 	return()
 endif()
 
-fte_add_plugin(fteplug_rott
+fte_add_plugin(rott
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/rott/fs_rott.c
 		${FTE_PLUGINS_ROOT_DIR}/rott/mod_rott.c
 		${FTE_PLUGINS_ROOT_DIR}/rott/rott.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c
+	INCLUDE_DIRECTORIES
+		${FTE_PLUGINS_ROOT_DIR}
+		${FTE_PLUGINS_ROOT_DIR}/rott
+		${FTE_ENGINE_CLIENT_DIR}
+		${FTE_ENGINE_QCLIB_DIR}
+		${FTE_ENGINE_GL_DIR}
+		${FTE_ENGINE_COMMON_DIR}
+	DEPENDENCIES
+		$<TARGET_NAME_IF_EXISTS:Math::Math>
+	COMPILE_DEFINITIONS
+		MULTITHREAD
 )
-target_include_directories(fteplug_rott PRIVATE ${FTE_PLUGINS_ROOT_DIR} ${FTE_PLUGINS_ROOT_DIR}/rott ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_QCLIB_DIR} ${FTE_ENGINE_GL_DIR} ${FTE_ENGINE_COMMON_DIR})
-target_compile_definitions(fteplug_rott PRIVATE MULTITHREAD)

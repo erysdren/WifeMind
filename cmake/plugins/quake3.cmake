@@ -2,7 +2,7 @@ if(NOT FTE_PLUGIN_QUAKE3)
 	return()
 endif()
 
-fte_add_plugin(fteplug_quake3
+fte_add_plugin(quake3
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_bspq3.c
 		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_cluster.c
@@ -39,6 +39,16 @@ fte_add_plugin(fteplug_quake3
 		${FTE_PLUGINS_ROOT_DIR}/quake3/svq3_game.c
 		${FTE_PLUGINS_ROOT_DIR}/quake3/q3common.c
 		${FTE_PLUGINS_ROOT_DIR}/plugin.c
+	INCLUDE_DIRECTORIES
+		${FTE_PLUGINS_ROOT_DIR}
+		${FTE_ENGINE_CLIENT_DIR}
+		${FTE_ENGINE_COMMON_DIR}
+		${FTE_ENGINE_GL_DIR}
+		${FTE_ENGINE_QCLIB_DIR}
+	DEPENDENCIES
+		$<TARGET_NAME_IF_EXISTS:Math::Math>
+	COMPILE_DEFINITIONS
+		MULTITHREAD
+		BOTLIB
+		BOTLIB_STATIC
 )
-target_include_directories(fteplug_quake3 PRIVATE ${FTE_PLUGINS_ROOT_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_GL_DIR} ${FTE_ENGINE_QCLIB_DIR})
-target_compile_definitions(fteplug_quake3 PRIVATE MULTITHREAD BOTLIB BOTLIB_STATIC)
