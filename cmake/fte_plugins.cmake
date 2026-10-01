@@ -23,14 +23,10 @@ function(fte_add_plugin name)
 	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "" "SOURCES;INCLUDE_DIRECTORIES;DEPENDENCIES;COMPILE_DEFINITIONS")
 	set(target fteplug_${name})
 	add_library(${target} SHARED ${ARG_SOURCES})
-	target_compile_options(${target}
-		PRIVATE
-			${FTE_COMMON_OPTIONS}
-	)
+	fte_add_common(${target})
 	target_link_options(${target}
 		PRIVATE
 			$<$<C_COMPILER_ID:GNU,Clang>:-Wl,--no-undefined>
-			${FTE_COMMON_LINK_OPTIONS}
 	)
 	target_link_libraries(${target}
 		PRIVATE
@@ -39,7 +35,6 @@ function(fte_add_plugin name)
 	target_compile_definitions(${target}
 		PRIVATE
 			FTEPLUGIN
-			${FTE_COMMON_DEFINITIONS}
 			${ARG_COMPILE_DEFINITIONS}
 	)
 	target_include_directories(${target}

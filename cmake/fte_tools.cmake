@@ -9,18 +9,7 @@ function(fte_add_tool name)
 	else()
 		add_executable(${name} ${ARG_SOURCES})
 	endif()
-	target_compile_options(${name}
-		PRIVATE
-			${FTE_COMMON_OPTIONS}
-	)
-	target_link_options(${name}
-		PRIVATE
-			${FTE_COMMON_LINK_OPTIONS}
-	)
-	target_compile_definitions(${name}
-		PRIVATE
-			${FTE_COMMON_DEFINITIONS}
-	)
+	fte_add_common(${name})
 	set_target_properties(${name}
 		PROPERTIES
 			LIBRARY_OUTPUT_DIRECTORY $<1:${FTE_INSTALL_PREFIX}/bin>

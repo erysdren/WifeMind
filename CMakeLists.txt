@@ -113,6 +113,24 @@ include(fte_system)
 include(fte_directories)
 include(fte_config)
 
+# common options helper function
+# NOTE: this intentionally comes after all the vars were set by the above includes
+
+function(fte_add_common target)
+	target_compile_options(${target}
+		PRIVATE
+			${FTE_COMMON_OPTIONS}
+	)
+	target_link_options(${target}
+		PRIVATE
+			${FTE_COMMON_LINK_OPTIONS}
+	)
+	target_compile_definitions(${target}
+		PRIVATE
+			${FTE_COMMON_DEFINITIONS}
+	)
+endfunction()
+
 # components
 
 include(fte_tools)
