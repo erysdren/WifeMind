@@ -16,9 +16,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-cmake_policy(SET CMP0072 NEW)
-cmake_policy(SET CMP0135 NEW)
-cmake_policy(SET CMP0115 NEW)
+cmake_policy(SET CMP0072 NEW) # prefer GLVND
+cmake_policy(SET CMP0135 NEW) # set FetchContent URL timestamps based on time of extraction
+cmake_policy(SET CMP0115 NEW) # prefer explicitly set source file extension
 
 # options
 
