@@ -29,6 +29,7 @@ extern void *fs_thread_mutex;
 extern float fs_accessed_time;
 extern cvar_t	fs_dlURL;
 
+#undef CreateFile //stoopid windows.h
 struct searchpath_s;
 struct searchpathfuncs_s
 {

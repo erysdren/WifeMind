@@ -24,11 +24,11 @@ add_link_options(
 	$<$<BOOL:${MINGW}>:-static>
 	$<$<BOOL:${MINGW}>:-static-libgcc>
 	$<$<BOOL:${MINGW}>:-static-libstdc++>
-	$<$<BOOL:${MINGW}>:-mcrtdll=msvcrt-os>
+	$<$<BOOL:${MINGW}>:-mcrtdll=msvcrt20> # was msvcrt-os
 )
 add_compile_definitions(
-	$<$<BOOL:${MINGW}>:__MSVCRT_VERSION__=0x700>
-	$<$<BOOL:${MINGW}>:_WIN32_WINNT=0x0501>
+	$<$<BOOL:${MINGW}>:__MSVCRT_VERSION__=0x200> # was 0x700
+	$<$<BOOL:${MINGW}>:_WIN32_WINNT=0x0500> # was 0x0501
 )
 
 # options
