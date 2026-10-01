@@ -134,7 +134,9 @@ set(FTE_ENGINE_CLIENT_SOURCES
 	${FTE_ENGINE_CLIENT_DIR}/pr_csqc.c
 	${FTE_ENGINE_CLIENT_DIR}/console.c
 	${FTE_ENGINE_CLIENT_DIR}/image.c
+	${FTE_ENGINE_CLIENT_DIR}/image_blp.c
 	${FTE_ENGINE_CLIENT_DIR}/image_bmp.c
+	${FTE_ENGINE_CLIENT_DIR}/image_dds.c
 	${FTE_ENGINE_CLIENT_DIR}/image_exr.c
 	${FTE_ENGINE_CLIENT_DIR}/image_hdr.c
 	${FTE_ENGINE_CLIENT_DIR}/image_ktx.c

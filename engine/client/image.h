@@ -9,11 +9,22 @@
 float HalfToFloat(unsigned short val);
 unsigned short FloatToHalf(float val);
 
+#ifdef IMAGEFMT_BLP
+// image_blp.c
+struct pendingtextureinfo *Image_ReadBLPFile(unsigned int flags, const char *fname, qbyte *filedata, size_t filesize);
+#endif
+
 #ifdef IMAGEFMT_BMP
 // image_bmp.c
 qbyte *ReadBMPFile(qbyte *buf, int length, int *width, int *height);
 qboolean WriteBMPFile(char *filename, enum fs_relative fsroot, qbyte *in, qintptr_t instride, int width, int height, uploadfmt_t fmt);
 qbyte *ReadICOFile(const char *fname, qbyte *buf, int length, int *width, int *height, uploadfmt_t *fmt);
+#endif
+
+#ifdef IMAGEFMT_DDS
+// image_dds.c
+qboolean Image_WriteDDSFile(const char *filename, enum fs_relative fsroot, struct pendingtextureinfo *mips);
+struct pendingtextureinfo *Image_ReadDDSFile(unsigned int flags, const char *fname, qbyte *filedata, size_t filesize);
 #endif
 
 #ifdef IMAGEFMT_EXR
