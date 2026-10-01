@@ -425,10 +425,11 @@ if(0)
 			${FTE_ENGINE_CLIENT_DIR}
 			${FTE_ENGINE_QCLIB_DIR}
 			${FTE_ENGINE_GL_DIR}
+			${ZLIB_INCLUDE_DIRS}
 	)
 	target_link_libraries(fteqw-cl
 		PRIVATE
-			ZLIB::ZLIB
+			${ZLIB_LIBRARIES}
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
 			$<TARGET_NAME_IF_EXISTS:Freetype::Freetype>
 			$<$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},1>:SDL::SDL>
