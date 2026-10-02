@@ -50,6 +50,9 @@ typedef struct shader_s shader_t;
 #define rshader_t shader_t	//the shader the material will draw with
 #define mpic_t shader_t
 
+// max size of a WAD2/WAD3 name
+#define WAD2_LUMP_NAME_LENGTH 16
+
 //atlased images within some larger atlas
 //must not be tiled etc
 typedef struct apic_s
@@ -82,7 +85,7 @@ typedef struct
 	char		type;
 	char		compression;
 	char		pad1, pad2;
-	char		name[16];				// must be null terminated
+	char		name[WAD2_LUMP_NAME_LENGTH];				// must be null terminated
 } lumpinfo_t;
 
 extern	int			wad_numlumps;

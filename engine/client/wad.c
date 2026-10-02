@@ -61,7 +61,7 @@ void W_CleanupName (const char *in, char *out)
 	if (!strncmp(in, "textures/", 9))
 		in += 9;
 	
-	for (i=0 ; i<16 ; i++ )
+	for (i=0 ; i<WAD2_LUMP_NAME_LENGTH ; i++ )
 	{
 		c = in[i];
 		if (!c)
@@ -74,7 +74,7 @@ void W_CleanupName (const char *in, char *out)
 		out[i] = c;
 	}
 	
-	for ( ; i< 16 ; i++ )
+	for ( ; i< WAD2_LUMP_NAME_LENGTH ; i++ )
 		out[i] = 0;
 }
 
@@ -146,7 +146,7 @@ void *W_GetLumpName (const char *name, size_t *size, qbyte *type)
 {
 	int		i;
 	lumpinfo_t	*lump_p;
-	char	clean[16];
+	char	clean[WAD2_LUMP_NAME_LENGTH];
 
 	*type = 0;
 	*size = 0;
@@ -155,7 +155,7 @@ void *W_GetLumpName (const char *name, size_t *size, qbyte *type)
 
 	for (lump_p=wad_lumps, i=0 ; i<wad_numlumps ; i++,lump_p++)
 	{
-		if (!strcmp(clean, lump_p->name))
+		if (!strncmp(clean, lump_p->name, WAD2_LUMP_NAME_LENGTH))
 		{
 			*type = lump_p->type;
 			*size = lump_p->disksize;
@@ -229,7 +229,7 @@ void SwapPic (qpic_t *pic)
 
 //FIXME: convert to linked list. is hunk possible?
 //hash tables?
-#define TEXWAD_MAXIMAGES 16384
+//#define TEXWAD_MAXIMAGES 16384
 
 typedef struct wadfile_s
 {
@@ -240,13 +240,13 @@ typedef struct wadfile_s
 
 typedef struct
 {
-	char name[16];
+	char name[WAD2_LUMP_NAME_LENGTH];
 	vfsfile_t *file;
 	int position;
 	int size;
 } texwadlump_t;
-static int numwadtextures;
-static texwadlump_t texwadlump[TEXWAD_MAXIMAGES];
+static size_t numwadtextures = 0;
+static texwadlump_t *texwadlump = NULL;
 
 static wadfile_t *openwadfiles;
 
@@ -263,6 +263,9 @@ void Wads_Flush (void)
 		Z_Free(openwadfiles);
 		openwadfiles = wf;
 	}
+
+	if (texwadlump) Z_Free(texwadlump);
+	texwadlump = NULL;
 
 	numwadtextures=0;
 	if (wadmutex)
@@ -308,7 +311,7 @@ void W_LoadTextureWadFile (char *filename, int complain)
 	{Con_Printf ("W_LoadTextureWadFile: Wad file %s doesn't have WAD3 id\n",filename);return;}
 
 	numlumps = LittleLong(header.numlumps);
-	if (numlumps < 1 || numlumps > TEXWAD_MAXIMAGES)
+	if (numlumps < 1)
 	{Con_Printf ("W_LoadTextureWadFile: invalid number of lumps (%i)\n", numlumps);return;}
 	infotableofs = LittleLong(header.infotableofs);
 	if (!VFS_SEEK(file, infotableofs))
@@ -324,18 +327,16 @@ void W_LoadTextureWadFile (char *filename, int complain)
 		W_CleanupName (lump_p->name, lump_p->name);
 		for (j = 0;j < numwadtextures;j++)
 		{
-			if (!strcmp(lump_p->name, texwadlump[j].name)) // name match, replace old one
+			if (!strncmp(lump_p->name, texwadlump[j].name, sizeof(lump_p->name))) // name match, replace old one
 				break;
 		}
-		if (j >= TEXWAD_MAXIMAGES)
-			break; // abort loading
 		if (j == numwadtextures)
 		{
+			Z_ReallocElements((void**)&texwadlump, &numwadtextures, numwadtextures + 1, sizeof(texwadlump_t));
 			W_CleanupName (lump_p->name, texwadlump[j].name);
 			texwadlump[j].file = file;
 			texwadlump[j].position = LittleLong(lump_p->filepos);
 			texwadlump[j].size = LittleLong(lump_p->disksize);
-			numwadtextures++;
 		}
 	}	
 	// leaves the file open
@@ -466,7 +467,7 @@ qbyte *W_ConvertWAD3Texture(miptex_t *tex, size_t lumpsize, int *width, int *hei
 
 qbyte *W_GetTexture(const char *name, int *width, int *height, uploadfmt_t *format)//returns rgba
 {
-	char texname[17];
+	char texname[WAD2_LUMP_NAME_LENGTH + 1];
 	int i, j;
 	vfsfile_t *file;
 	miptex_t *tex;
@@ -563,7 +564,7 @@ qbyte *W_GetTexture(const char *name, int *width, int *height, uploadfmt_t *form
 		}
 	}
 
-	texname[16] = 0;
+	texname[WAD2_LUMP_NAME_LENGTH] = 0;
 	W_CleanupName (name, texname);
 	Sys_LockMutex(wadmutex);
 	for (i = 0;i < numwadtextures;i++)
@@ -609,12 +610,12 @@ qbyte *W_GetTexture(const char *name, int *width, int *height, uploadfmt_t *form
 
 miptex_t *W_GetMipTex(const char *name)
 {
-	char texname[17];
+	char texname[WAD2_LUMP_NAME_LENGTH + 1];
 	int i, j;
 	vfsfile_t *file;
 	miptex_t *tex;
 
-	texname[16] = 0;
+	texname[WAD2_LUMP_NAME_LENGTH] = 0;
 	W_CleanupName (name, texname);
 	Sys_LockMutex(wadmutex);
 	for (i = 0;i < numwadtextures;i++)
