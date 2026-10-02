@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef GLQUAKE_H
 #define GLQUAKE_H
 
+#define MAX_ARRAY_VERTS 65535
+
 // disable data conversion warnings
 #ifdef MSVCDISABLEWARNINGS
 #pragma warning(disable : 4244)     // MIPS

@@ -1459,7 +1459,6 @@ static void SHM_ComposeVolume_Fan(vecV_t *points, int numpoints)
 	int lastedge;
 	int i;
 
-	#define MAX_ARRAY_VERTS 65535
 	static index_t pointidx[MAX_ARRAY_VERTS];
 
 	/*make sure there's space*/
@@ -1502,7 +1501,6 @@ static void SHM_ComposeVolume_Soup(vecV_t *points, int numpoints, index_t *idx, 
 	int newmax;
 	int i;
 
-	#define MAX_ARRAY_VERTS 65535
 	static index_t pointidx[MAX_ARRAY_VERTS];
 
 	/*make sure there's space*/

@@ -2952,8 +2952,6 @@ mfog_t *Mod_FogForOrigin(model_t *wmodel, vec3_t org)
 
 //Convert a patch in to a list of glpolys
 
-#define MAX_ARRAY_VERTS 65535
-
 static index_t tempIndexesArray[MAX_ARRAY_VERTS*6];
 
 static void GL_SizePatchFixed(mesh_t *mesh, int patchwidth, int patchheight, int numverts, int firstvert, cminfo_t *prv)

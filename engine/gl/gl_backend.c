@@ -1557,8 +1557,6 @@ void GLBE_DestroyFBOs(void)
 	}
 }
 
-#define MAX_ARRAY_VERTS 65536
-
 typedef struct glArrays_s {
 	size_t max_array_verts;
 	size_t num_array_verts;
@@ -2056,7 +2054,7 @@ static void GenerateTCMods3(const shaderpass_t *pass, int passnum)
 	GL_SelectVBO(shaderstate.vbo_texcoords[passnum]);
 
 	{
-		qglBufferDataARB(GL_ARRAY_BUFFER_ARB, MAX_ARRAY_VERTS*sizeof(float)*3, NULL, GL_STREAM_DRAW_ARB);
+		qglBufferDataARB(GL_ARRAY_BUFFER_ARB, glArrays.max_array_verts*sizeof(float)*3, NULL, GL_STREAM_DRAW_ARB);
 		for (; meshlist; meshlist = meshlist->next)
 		{
 			int i;
@@ -2118,7 +2116,7 @@ static void GenerateTCMods(const shaderpass_t *pass, int passnum)
 	GL_SelectVBO(shaderstate.vbo_texcoords[passnum]);
 
 	{
-		qglBufferDataARB(GL_ARRAY_BUFFER_ARB, MAX_ARRAY_VERTS*sizeof(float)*2, NULL, GL_STREAM_DRAW_ARB);
+		qglBufferDataARB(GL_ARRAY_BUFFER_ARB, glArrays.max_array_verts*sizeof(float)*2, NULL, GL_STREAM_DRAW_ARB);
 		for (; meshlist; meshlist = meshlist->next)
 		{
 			int i;
