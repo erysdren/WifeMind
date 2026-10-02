@@ -2952,8 +2952,6 @@ mfog_t *Mod_FogForOrigin(model_t *wmodel, vec3_t org)
 
 //Convert a patch in to a list of glpolys
 
-static index_t tempIndexesArray[MAX_ARRAY_VERTS*6];
-
 static void GL_SizePatchFixed(mesh_t *mesh, int patchwidth, int patchheight, int numverts, int firstvert, cminfo_t *prv)
 {
 	unsigned short patch_cp[2];
@@ -3023,7 +3021,7 @@ static void GL_SizePatch(mesh_t *mesh, int patchwidth, int patchheight, int numv
 static void GL_CreateMeshForPatch (model_t *mod, mesh_t *mesh, int patchwidth, int patchheight, int numverts, int firstvert)
 {
 	cminfo_t	*prv = (cminfo_t*)mod->meshinfo;
-	int numindexes, step[2], size[2], flat[2], i, u, v, p;
+	int step[2], size[2], flat[2], i, u, v, p;
 	unsigned short patch_cp[2];
 	index_t	*indexes;
 	float subdivlevel;
@@ -3085,8 +3083,7 @@ static void GL_CreateMeshForPatch (model_t *mod, mesh_t *mesh, int patchwidth, i
 	}
 
 // compute new indexes avoiding adding invalid triangles
-	numindexes = 0;
-	indexes = tempIndexesArray;
+	indexes = mesh->indexes;
 	for (v = 0, i = 0; v < size[1]-1; v++)
 	{
 		for (u = 0; u < size[0]-1; u++, i += 6)
@@ -3100,7 +3097,6 @@ static void GL_CreateMeshForPatch (model_t *mod, mesh_t *mesh, int patchwidth, i
 //				!VectorEquals(mesh->xyz_array[indexes[1]], mesh->xyz_array[indexes[2]]) )
 			{
 				indexes += 3;
-				numindexes += 3;
 			}
 
 			indexes[0] = p + 1;
@@ -3112,22 +3108,15 @@ static void GL_CreateMeshForPatch (model_t *mod, mesh_t *mesh, int patchwidth, i
 //				!VectorEquals(mesh->xyz_array[indexes[1]], mesh->xyz_array[indexes[2]]) )
 			{
 				indexes += 3;
-				numindexes += 3;
 			}
 		}
 	}
-
-// allocate and fill index table
-
-	mesh->numindexes = numindexes;
-
-	memcpy (mesh->indexes, tempIndexesArray, numindexes * sizeof(index_t) );
 }
 
 static void GL_CreateMeshForPatchFixed (model_t *mod, mesh_t *mesh, int patchwidth, int patchheight, int numverts, int firstvert)
 {
 	cminfo_t	*prv = (cminfo_t*)mod->meshinfo;
-	int numindexes, step[2], size[2], i, u, v, p;
+	int step[2], size[2], i, u, v, p;
 	unsigned short patch_cp[2];
 	index_t	*indexes;
 	float subdivlevel;
@@ -3193,8 +3182,7 @@ static void GL_CreateMeshForPatchFixed (model_t *mod, mesh_t *mesh, int patchwid
 	}
 
 // compute new indexes avoiding adding invalid triangles
-	numindexes = 0;
-	indexes = tempIndexesArray;
+	indexes = mesh->indexes;
 	for (v = 0, i = 0; v < size[1]-1; v++)
 	{
 		for (u = 0; u < size[0]-1; u++, i += 6)
@@ -3208,7 +3196,6 @@ static void GL_CreateMeshForPatchFixed (model_t *mod, mesh_t *mesh, int patchwid
 //				!VectorEquals(mesh->xyz_array[indexes[1]], mesh->xyz_array[indexes[2]]) )
 			{
 				indexes += 3;
-				numindexes += 3;
 			}
 
 			indexes[0] = p + 1;
@@ -3220,16 +3207,9 @@ static void GL_CreateMeshForPatchFixed (model_t *mod, mesh_t *mesh, int patchwid
 //				!VectorEquals(mesh->xyz_array[indexes[1]], mesh->xyz_array[indexes[2]]) )
 			{
 				indexes += 3;
-				numindexes += 3;
 			}
 		}
 	}
-
-// allocate and fill index table
-
-	mesh->numindexes = numindexes;
-
-	memcpy (mesh->indexes, tempIndexesArray, numindexes * sizeof(index_t) );
 }
 
 #ifdef RFBSPS
