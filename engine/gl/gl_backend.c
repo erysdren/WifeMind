@@ -1557,6 +1557,20 @@ void GLBE_DestroyFBOs(void)
 	}
 }
 
+#define MAX_ARRAY_VERTS 65536
+
+typedef struct glArrays_s {
+	size_t max_array_verts;
+	size_t num_array_verts;
+	size_t max_shader_passes;
+	void *membase;
+	vecV_t* vertices;
+	avec4_t* colours;
+	float* texcoords[SHADER_PASS_MAX];
+} glArrays_t;
+
+static glArrays_t glArrays = { 0, 0, 0, NULL };
+
 void GLBE_Shutdown(void)
 {
 	size_t u;
@@ -1582,14 +1596,39 @@ void GLBE_Shutdown(void)
 	for (u = 0; u < countof(shaderstate.currenttextures); u++)
 		GL_LazyBind(u, r_nulltex);
 	GL_SelectTexture(0);
+
+	// clean up glArrays
+	// FIXME: make max_shader_passes and max_array_verts modified by level size
+	if (glArrays.membase != NULL)
+		Z_Free(glArrays.membase);
+	memset(&glArrays, 0, sizeof(glArrays));
+#ifdef FTE_TARGET_WEB
+	glArrays.max_shader_passes = 1;
+#else
+	glArrays.max_shader_passes = SHADER_PASS_MAX;
+#endif
+	glArrays.max_array_verts = MAX_ARRAY_VERTS;
 }
 
 void GLBE_Init(void)
 {
 	int i;
 	double t;
+	size_t sz;
 
 	GLBE_Shutdown();
+
+	// allocate glArrays and setup pointers
+	glArrays.num_array_verts = glArrays.max_array_verts;
+	sz = sizeof(vecV_t) * glArrays.num_array_verts;
+	sz += sizeof(avec4_t) * glArrays.num_array_verts;
+	sz += sizeof(float) * glArrays.num_array_verts * 2 * glArrays.max_shader_passes;
+	glArrays.membase = Z_Malloc(sz);
+	glArrays.vertices = (vecV_t*)glArrays.membase;
+	glArrays.colours = (avec4_t*)(glArrays.vertices + glArrays.num_array_verts);
+	glArrays.texcoords[0] = (float*)(glArrays.colours + glArrays.num_array_verts);
+	for (i = 1; i < glArrays.max_shader_passes; i++)
+		glArrays.texcoords[i] = glArrays.texcoords[i-1] + (glArrays.num_array_verts * 2);
 
 	memset(&shaderstate, 0, sizeof(shaderstate));
 
@@ -1723,16 +1762,7 @@ void GLBE_Init(void)
 
 //end tables
 
-#define MAX_ARRAY_VERTS 65536
-static vecV_t		vertexarray[MAX_ARRAY_VERTS];
 #if 1//ndef GLSLONLY
-static avec4_t		coloursarray[MAX_ARRAY_VERTS];
-#ifdef FTE_TARGET_WEB
-static float		texcoordarray[1][MAX_ARRAY_VERTS*2];
-#else
-static float		texcoordarray[SHADER_PASS_MAX][MAX_ARRAY_VERTS*2];
-#endif
-
 /*========================================== texture coord generation =====================================*/
 
 static void tcgen_environment(float *st, unsigned int numverts, float *xyz, float *normal)
@@ -1817,14 +1847,14 @@ static void GenerateTCFog(int passnum, mfog_t *fog)
 	{
 		mesh = shaderstate.meshes[m];
 		if (!mesh->xyz_array)
-			memset(texcoordarray[passnum]+mesh->vbofirstvert*2, 0, mesh->numvertexes*sizeof(float)*2);
+			memset(glArrays.texcoords[passnum]+mesh->vbofirstvert*2, 0, mesh->numvertexes*sizeof(float)*2);
 		else
-			tcgen_fog(texcoordarray[passnum]+mesh->vbofirstvert*2, mesh->numvertexes, (float*)mesh->xyz_array, fog);
+			tcgen_fog(glArrays.texcoords[passnum]+mesh->vbofirstvert*2, mesh->numvertexes, (float*)mesh->xyz_array, fog);
 	}
 
 	shaderstate.pendingtexcoordparts[passnum] = 2;
 	shaderstate.pendingtexcoordvbo[passnum] = 0;
-	shaderstate.pendingtexcoordpointer[passnum] = texcoordarray[passnum];
+	shaderstate.pendingtexcoordpointer[passnum] = glArrays.texcoords[passnum];
 }
 #endif
 
@@ -2005,17 +2035,17 @@ static void GenerateTCMods3(const shaderpass_t *pass, int passnum)
 	{
 		mesh = shaderstate.meshes[m];
 
-		src = tcgen3(pass, mesh->numvertexes, texcoordarray[passnum]+mesh->vbofirstvert*3, mesh);
+		src = tcgen3(pass, mesh->numvertexes, glArrays.texcoords[passnum]+mesh->vbofirstvert*3, mesh);
 
-		if (src != texcoordarray[passnum]+mesh->vbofirstvert*3)
+		if (src != glArrays.texcoords[passnum]+mesh->vbofirstvert*3)
 		{
 			//this shouldn't actually ever be true
-			memcpy(texcoordarray[passnum]+mesh->vbofirstvert*3, src, sizeof(vec3_t)*mesh->numvertexes);
+			memcpy(glArrays.texcoords[passnum]+mesh->vbofirstvert*3, src, sizeof(vec3_t)*mesh->numvertexes);
 		}
 	}
 	shaderstate.pendingtexcoordparts[passnum] = 3;
 	shaderstate.pendingtexcoordvbo[passnum] = 0;
-	shaderstate.pendingtexcoordpointer[passnum] = texcoordarray[passnum];
+	shaderstate.pendingtexcoordpointer[passnum] = glArrays.texcoords[passnum];
 #else
 	GL_DeselectVAO();
 	if (!shaderstate.vbo_texcoords[passnum])
@@ -2031,7 +2061,7 @@ static void GenerateTCMods3(const shaderpass_t *pass, int passnum)
 		{
 			int i;
 			float *src;
-			src = tcge3n(pass, meshlist->numvertexes, texcoordarray[passnum], meshlist);
+			src = tcge3n(pass, meshlist->numvertexes, glArrays.texcoords[passnum], meshlist);
 			qglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, meshlist->vbofirstvert*8, meshlist->numvertexes*8, src);
 		}
 	}
@@ -2052,7 +2082,7 @@ static void GenerateTCMods(const shaderpass_t *pass, int passnum)
 	{
 		mesh = shaderstate.meshes[m];
 
-		src = tcgen(pass, mesh->numvertexes, texcoordarray[passnum]+mesh->vbofirstvert*2, mesh);
+		src = tcgen(pass, mesh->numvertexes, glArrays.texcoords[passnum]+mesh->vbofirstvert*2, mesh);
 		//tcgen might return unmodified info
 		if (!src)
 		{	//don't crash... not much else we can do.
@@ -2062,22 +2092,22 @@ static void GenerateTCMods(const shaderpass_t *pass, int passnum)
 		}
 		else if (pass->numtcmods)
 		{
-			tcmod(&pass->tcmods[0], mesh->numvertexes, src, texcoordarray[passnum]+mesh->vbofirstvert*2, mesh);
+			tcmod(&pass->tcmods[0], mesh->numvertexes, src, glArrays.texcoords[passnum]+mesh->vbofirstvert*2, mesh);
 			for (i = 1; i < pass->numtcmods; i++)
 			{
-				tcmod(&pass->tcmods[i], mesh->numvertexes, texcoordarray[passnum]+mesh->vbofirstvert*2, texcoordarray[passnum]+mesh->vbofirstvert*2, mesh);
+				tcmod(&pass->tcmods[i], mesh->numvertexes, glArrays.texcoords[passnum]+mesh->vbofirstvert*2, glArrays.texcoords[passnum]+mesh->vbofirstvert*2, mesh);
 			}
-			src = texcoordarray[passnum]+mesh->vbofirstvert*2;
+			src = glArrays.texcoords[passnum]+mesh->vbofirstvert*2;
 		}
-		else if (src != texcoordarray[passnum]+mesh->vbofirstvert*2)
+		else if (src != glArrays.texcoords[passnum]+mesh->vbofirstvert*2)
 		{
 			//this shouldn't actually ever be true
-			memcpy(texcoordarray[passnum]+mesh->vbofirstvert*2, src, 8*mesh->numvertexes);
+			memcpy(glArrays.texcoords[passnum]+mesh->vbofirstvert*2, src, 8*mesh->numvertexes);
 		}
 	}
 	shaderstate.pendingtexcoordparts[passnum] = 2;
 	shaderstate.pendingtexcoordvbo[passnum] = 0;
-	shaderstate.pendingtexcoordpointer[passnum] = texcoordarray[passnum];
+	shaderstate.pendingtexcoordpointer[passnum] = glArrays.texcoords[passnum];
 #else
 	GL_DeselectVAO();
 	if (!shaderstate.vbo_texcoords[passnum])
@@ -2093,16 +2123,16 @@ static void GenerateTCMods(const shaderpass_t *pass, int passnum)
 		{
 			int i;
 			float *src;
-			src = tcgen(pass, meshlist->numvertexes, texcoordarray[passnum], meshlist);
+			src = tcgen(pass, meshlist->numvertexes, glArrays.texcoords[passnum], meshlist);
 			//tcgen might return unmodified info
 			if (pass->numtcmods)
 			{
-				tcmod(&pass->tcmods[0], meshlist->numvertexes, src, texcoordarray[passnum], meshlist);
+				tcmod(&pass->tcmods[0], meshlist->numvertexes, src, glArrays.texcoords[passnum], meshlist);
 				for (i = 1; i < pass->numtcmods; i++)
 				{
-					tcmod(&pass->tcmods[i], meshlist->numvertexes, texcoordarray[passnum], texcoordarray[passnum], meshlist);
+					tcmod(&pass->tcmods[i], meshlist->numvertexes, glArrays.texcoords[passnum], glArrays.texcoords[passnum], meshlist);
 				}
-				src = texcoordarray[passnum];
+				src = glArrays.texcoords[passnum];
 			}
 			qglBufferSubDataARB(GL_ARRAY_BUFFER_ARB, meshlist->vbofirstvert*8, meshlist->numvertexes*8, src);
 		}
@@ -2310,7 +2340,7 @@ static void BE_GenTempMeshVBO(vbo_t **vbo, mesh_t *m);
 static void DeformGen_Text(int stringid, int cnt, vecV_t *src, vecV_t *dst, const mesh_t *mesh)
 {
 #define maxlen 32
-	vecV_t *textverts = vertexarray;
+	vecV_t *textverts = glArrays.vertices;
 	static vec2_t texttc[maxlen*4];
 	extern index_t	r_quad_indexes[];
 	static mesh_t textmesh, *meshptr = &textmesh;
@@ -2653,7 +2683,7 @@ static void GenerateVertexBlends(const shader_t *shader)
 	{
 		meshlist = shaderstate.meshes[m];
 
-		ov = vertexarray+meshlist->vbofirstvert;
+		ov = glArrays.vertices+meshlist->vbofirstvert;
 		iv1 = meshlist->xyz_array;
 		iv2 = meshlist->xyz2_array;
 		w1 = meshlist->xyz_blendw[0];
@@ -2666,11 +2696,11 @@ static void GenerateVertexBlends(const shader_t *shader)
 		}
 		for (i = 0; i < shader->numdeforms; i++)
 		{
-			deformgen(&shader->deforms[i], meshlist->numvertexes, vertexarray+meshlist->vbofirstvert, vertexarray+meshlist->vbofirstvert, meshlist);
+			deformgen(&shader->deforms[i], meshlist->numvertexes, glArrays.vertices+meshlist->vbofirstvert, glArrays.vertices+meshlist->vbofirstvert, meshlist);
 		}
 	}
 
-	shaderstate.pendingvertexpointer = vertexarray;
+	shaderstate.pendingvertexpointer = glArrays.vertices;
 	shaderstate.pendingvertexvbo = 0;
 }
 static void GenerateVertexDeforms(const shader_t *shader)
@@ -2681,14 +2711,14 @@ static void GenerateVertexDeforms(const shader_t *shader)
 	{
 		meshlist = shaderstate.meshes[m];
 
-		deformgen(&shader->deforms[0], meshlist->numvertexes, meshlist->xyz_array, vertexarray+meshlist->vbofirstvert, meshlist);
+		deformgen(&shader->deforms[0], meshlist->numvertexes, meshlist->xyz_array, glArrays.vertices+meshlist->vbofirstvert, meshlist);
 		for (i = 1; i < shader->numdeforms; i++)
 		{
-			deformgen(&shader->deforms[i], meshlist->numvertexes, vertexarray+meshlist->vbofirstvert, vertexarray+meshlist->vbofirstvert, meshlist);
+			deformgen(&shader->deforms[i], meshlist->numvertexes, glArrays.vertices+meshlist->vbofirstvert, glArrays.vertices+meshlist->vbofirstvert, meshlist);
 		}
 	}
 
-	shaderstate.pendingvertexpointer = vertexarray;
+	shaderstate.pendingvertexpointer = glArrays.vertices;
 	shaderstate.pendingvertexvbo = 0;
 }
 
@@ -2868,13 +2898,13 @@ static void GenerateColourMods(const shaderpass_t *pass)
 		{
 			meshlist = shaderstate.meshes[m];
 
-			colourgen(pass, meshlist->numvertexes, meshlist->colors4f_array[0], coloursarray + meshlist->vbofirstvert, meshlist);
-			alphagen(pass, meshlist->numvertexes, meshlist->colors4f_array[0], coloursarray + meshlist->vbofirstvert, meshlist);
+			colourgen(pass, meshlist->numvertexes, meshlist->colors4f_array[0], glArrays.colours + meshlist->vbofirstvert, meshlist);
+			alphagen(pass, meshlist->numvertexes, meshlist->colors4f_array[0], glArrays.colours + meshlist->vbofirstvert, meshlist);
 		}
 
 		shaderstate.colourarraytype = GL_FLOAT;
 		shaderstate.pendingcolourvbo = 0;
-		shaderstate.pendingcolourpointer = coloursarray;
+		shaderstate.pendingcolourpointer = glArrays.colours;
 	}
 }
 
@@ -4419,8 +4449,8 @@ static void BE_LegacyLighting(void)
 		if (!mesh->normals_array)
 			return;
 
-		col = coloursarray[0] + mesh->vbofirstvert*4;
-		ldir = texcoordarray[0] + mesh->vbofirstvert*3;
+		col = glArrays.colours[0] + mesh->vbofirstvert*4;
+		ldir = glArrays.texcoords[0] + mesh->vbofirstvert*3;
 		for (i = 0; i < mesh->numvertexes; i++, col+=4, ldir+=3)
 		{
 			VectorSubtract(rellight, mesh->xyz_array[i], lightdir);
@@ -4454,7 +4484,7 @@ static void BE_LegacyLighting(void)
 		BE_SetPassBlendMode(tmu, PBM_DOTPRODUCT);
 		shaderstate.pendingtexcoordparts[tmu] = 3;
 		shaderstate.pendingtexcoordvbo[tmu] = 0;
-		shaderstate.pendingtexcoordpointer[tmu] = texcoordarray[0];
+		shaderstate.pendingtexcoordpointer[tmu] = glArrays.texcoords[0];
 		attr |= (1u<<(VATTR_LEG_TMU0+tmu));
 		tmu++;
 
@@ -4503,7 +4533,7 @@ static void BE_LegacyLighting(void)
 
 	shaderstate.colourarraytype = GL_FLOAT;
 	shaderstate.pendingcolourvbo = 0;
-	shaderstate.pendingcolourpointer = coloursarray;
+	shaderstate.pendingcolourpointer = glArrays.colours;
 
 	GL_DeSelectProgram();
 	BE_EnableShaderAttributes(attr, 0);
