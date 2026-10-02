@@ -373,7 +373,7 @@ typedef struct {
 	shader_t *shader;
 	shader_t *backshader;
 } fontplanes_t;
-static fontplanes_t fontplanes;
+static fontplanes_t *fontplanes = NULL;
 
 #define FONT_CHAR_BUFFER 512
 static index_t font_indicies[FONT_CHAR_BUFFER*6];
@@ -459,7 +459,12 @@ qboolean Font_TrackerValid(unsigned int imid)
 void Font_Init(void)
 {
 	int i;
-	TEXASSIGN(fontplanes.defaultfont, r_nulltex);
+
+	// allocate fontplanes
+	if (fontplanes) Z_Free(fontplanes);
+	fontplanes = Z_Malloc(sizeof(fontplanes_t));
+
+	TEXASSIGN(fontplanes->defaultfont, r_nulltex);
 
 	//clear tracker images, just in case they were still set for the previous renderer context
 	for (i = 0; i < sizeof(trackerimages)/sizeof(trackerimages[0]); i++)
@@ -487,10 +492,10 @@ void Font_Init(void)
 
 	for (i = 0; i < FONTPLANES; i++)
 	{
-		TEXASSIGN(fontplanes.texnum[i], Image_CreateTexture("***fontplane***", NULL, IF_UIPIC|(r_font_linear.ival?IF_LINEAR:IF_NEAREST|IF_NOPURGE)|IF_NOPICMIP|IF_NOMIPMAP|IF_NOGAMMA|IF_NOPURGE));
+		TEXASSIGN(fontplanes->texnum[i], Image_CreateTexture("***fontplane***", NULL, IF_UIPIC|(r_font_linear.ival?IF_LINEAR:IF_NEAREST|IF_NOPURGE)|IF_NOPICMIP|IF_NOMIPMAP|IF_NOGAMMA|IF_NOPURGE));
 	}
 
-	fontplanes.shader = R_RegisterShader("ftefont", SUF_2D,
+	fontplanes->shader = R_RegisterShader("ftefont", SUF_2D,
 		"{\n"
 			"fullrate\n"	//don't hurt readability of text.
 			"if $nofixed\n"
@@ -510,7 +515,7 @@ void Font_Init(void)
 		"}\n"
 		);
 
-	fontplanes.backshader = R_RegisterShader("ftefontback", SUF_2D,
+	fontplanes->backshader = R_RegisterShader("ftefontback", SUF_2D,
 		"{\n"
 			"nomipmaps\n"
 			"{\n"
@@ -531,11 +536,11 @@ static void Font_Flush(void)
 	R2D_Flush = NULL;
 	if (!font_foremesh.numindexes)
 		return;
-	if (fontplanes.planechanged)
+	if (fontplanes->planechanged)
 	{
-		Image_Upload(fontplanes.texnum[fontplanes.activeplane], TF_RGBA32, (void*)fontplanes.plane, NULL, PLANEWIDTH, PLANEHEIGHT, 1, IF_UIPIC|IF_NEAREST|IF_NOPICMIP|IF_NOMIPMAP|IF_NOGAMMA|IF_NOPURGE);
+		Image_Upload(fontplanes->texnum[fontplanes->activeplane], TF_RGBA32, (void*)fontplanes->plane, NULL, PLANEWIDTH, PLANEHEIGHT, 1, IF_UIPIC|IF_NEAREST|IF_NOPICMIP|IF_NOMIPMAP|IF_NOGAMMA|IF_NOPURGE);
 
-		fontplanes.planechanged = false;
+		fontplanes->planechanged = false;
 	}
 	font_foremesh.istrifan = (font_foremesh.numvertexes == 4);
 	if ((font_colourmask & (CON_RICHFORECOLOUR|CON_NONCLEARBG)) == CON_NONCLEARBG && font_foremesh.numindexes)
@@ -544,10 +549,10 @@ static void Font_Flush(void)
 		font_backmesh.numvertexes = font_foremesh.numvertexes;
 		font_backmesh.istrifan = font_foremesh.istrifan;
 
-		BE_DrawMesh_Single(fontplanes.backshader, &font_backmesh, NULL, font_be_flags);
+		BE_DrawMesh_Single(fontplanes->backshader, &font_backmesh, NULL, font_be_flags);
 	}
-	TEXASSIGN(fontplanes.shader->defaulttextures->base, font_texture);
-	BE_DrawMesh_Single(fontplanes.shader, &font_foremesh, NULL, font_be_flags);
+	TEXASSIGN(fontplanes->shader->defaulttextures->base, font_texture);
+	BE_DrawMesh_Single(fontplanes->shader, &font_foremesh, NULL, font_be_flags);
 	font_foremesh.numindexes = 0;
 	font_foremesh.numvertexes = 0;
 }
@@ -575,15 +580,20 @@ void Font_Shutdown(void)
 {
 	int i;
 
-	for (i = 0; i < FONTPLANES; i++)
-		TEXASSIGN(fontplanes.texnum[i], r_nulltex);
-	fontplanes.activeplane = 0;
-	fontplanes.oldestchar = NULL;
-	fontplanes.newestchar = NULL;
-	fontplanes.planechanged = 0;
-	fontplanes.planerowx = 0;
-	fontplanes.planerowy = 0;
-	fontplanes.planerowh = 0;
+	if (fontplanes) {
+		for (i = 0; i < FONTPLANES; i++)
+			TEXASSIGN(fontplanes->texnum[i], r_nulltex);
+		fontplanes->activeplane = 0;
+		fontplanes->oldestchar = NULL;
+		fontplanes->newestchar = NULL;
+		fontplanes->planechanged = 0;
+		fontplanes->planerowx = 0;
+		fontplanes->planerowy = 0;
+		fontplanes->planerowh = 0;
+		Z_Free(fontplanes);
+	}
+
+	fontplanes = NULL;
 }
 
 //we got too many chars and switched to a new plane - purge the chars in that plane
@@ -597,30 +607,30 @@ void Font_FlushPlane(void)
 	//we've not broken anything yet, flush while we can
 	Font_Flush();
 
-	if (fontplanes.planechanged)
+	if (fontplanes->planechanged)
 	{
-		Image_Upload(fontplanes.texnum[fontplanes.activeplane], TF_RGBA32, (void*)fontplanes.plane, NULL, PLANEWIDTH, PLANEHEIGHT, 1, IF_UIPIC|IF_NEAREST|IF_NOPICMIP|IF_NOMIPMAP|IF_NOGAMMA|IF_NOPURGE);
+		Image_Upload(fontplanes->texnum[fontplanes->activeplane], TF_RGBA32, (void*)fontplanes->plane, NULL, PLANEWIDTH, PLANEHEIGHT, 1, IF_UIPIC|IF_NEAREST|IF_NOPICMIP|IF_NOMIPMAP|IF_NOGAMMA|IF_NOPURGE);
 
-		fontplanes.planechanged = false;
+		fontplanes->planechanged = false;
 	}
 
-	fontplanes.activeplane++;
-	fontplanes.activeplane = fontplanes.activeplane % FONTPLANES;
-	fontplanes.planerowh = 0;
-	fontplanes.planerowx = 0;
-	fontplanes.planerowy = 0;
+	fontplanes->activeplane++;
+	fontplanes->activeplane = fontplanes->activeplane % FONTPLANES;
+	fontplanes->planerowh = 0;
+	fontplanes->planerowx = 0;
+	fontplanes->planerowy = 0;
 
-	while (fontplanes.oldestchar)
+	while (fontplanes->oldestchar)
 	{
-		if (fontplanes.oldestchar->texplane != fontplanes.activeplane)
+		if (fontplanes->oldestchar->texplane != fontplanes->activeplane)
 			break;
 
 		//remove it from the list of active chars, and invalidate it
-		fontplanes.oldestchar->texplane = INVALIDPLANE;
-		fontplanes.oldestchar = fontplanes.oldestchar->nextchar;
+		fontplanes->oldestchar->texplane = INVALIDPLANE;
+		fontplanes->oldestchar = fontplanes->oldestchar->nextchar;
 	}
-	if (!fontplanes.oldestchar)
-		fontplanes.newestchar = NULL;
+	if (!fontplanes->oldestchar)
+		fontplanes->newestchar = NULL;
 }
 
 static struct charcache_s *Font_GetCharIfLoaded(font_t *f, unsigned int charidx)
@@ -682,38 +692,38 @@ static struct charcache_s *Font_LoadGlyphData(font_t *f, CHARIDXTYPE charidx, FT
 
 	pad+=outline;
 	
-	if (fontplanes.texnum[0]->flags & IF_LINEAR)
+	if (fontplanes->texnum[0]->flags & IF_LINEAR)
 		pad += 1;	//pad the image data to avoid sampling outside
 
-	if (fontplanes.planerowx + (int)bmw+pad*2 >= PLANEWIDTH)
+	if (fontplanes->planerowx + (int)bmw+pad*2 >= PLANEWIDTH)
 	{
-		fontplanes.planerowx = 0;
-		fontplanes.planerowy += fontplanes.planerowh;
-		fontplanes.planerowh = 0;
+		fontplanes->planerowx = 0;
+		fontplanes->planerowy += fontplanes->planerowh;
+		fontplanes->planerowh = 0;
 	}
 
-	if (fontplanes.planerowy+(int)bmh+pad*2 >= PLANEHEIGHT)
+	if (fontplanes->planerowy+(int)bmh+pad*2 >= PLANEHEIGHT)
 		Font_FlushPlane();
 
-	if (fontplanes.newestchar)
-		fontplanes.newestchar->nextchar = c;
+	if (fontplanes->newestchar)
+		fontplanes->newestchar->nextchar = c;
 	else
-		fontplanes.oldestchar = c;
-	fontplanes.newestchar = c;
+		fontplanes->oldestchar = c;
+	fontplanes->newestchar = c;
 	c->nextchar = NULL;
 	c->flags = 0;
 
-	c->texplane = fontplanes.activeplane;
-	c->bmx = fontplanes.planerowx+pad;
-	c->bmy = fontplanes.planerowy+pad;
+	c->texplane = fontplanes->activeplane;
+	c->bmx = fontplanes->planerowx+pad;
+	c->bmy = fontplanes->planerowy+pad;
 	c->bmw = bmw;
 	c->bmh = bmh;
 
-	if (fontplanes.planerowh < (int)bmh+pad*2)
-		fontplanes.planerowh = bmh+pad*2;
-	fontplanes.planerowx += bmw+pad*2;
+	if (fontplanes->planerowh < (int)bmh+pad*2)
+		fontplanes->planerowh = bmh+pad*2;
+	fontplanes->planerowx += bmw+pad*2;
 
-	out = &fontplanes.plane[c->bmx+((int)c->bmy-pad)*PLANEHEIGHT];
+	out = &fontplanes->plane[c->bmx+((int)c->bmy-pad)*PLANEHEIGHT];
 	if (pixelmode == FT_PIXEL_MODE_GRAY)
 	{	//8bit font
 		for (y = -pad; y < 0; y++)
@@ -886,7 +896,7 @@ static struct charcache_s *Font_LoadGlyphData(font_t *f, CHARIDXTYPE charidx, FT
 			int bit;
 
 			alpha -= pitch*outline;
-			out = &fontplanes.plane[c->bmx+((int)c->bmy-outline)*PLANEHEIGHT];
+			out = &fontplanes->plane[c->bmx+((int)c->bmy-outline)*PLANEHEIGHT];
 			for (y = -outline; y < (int)bmh+outline; y++, out += PLANEWIDTH)
 				for (x = -outline; x < (int)bmw+outline; x++)
 				{
@@ -913,7 +923,7 @@ static struct charcache_s *Font_LoadGlyphData(font_t *f, CHARIDXTYPE charidx, FT
 			qbyte *alpha = (char*)data + bytes-1 - pitch*bmh;
 
 			alpha -= pitch*outline + bytes*outline;
-			out = &fontplanes.plane[c->bmx+((int)c->bmy-outline)*PLANEHEIGHT];
+			out = &fontplanes->plane[c->bmx+((int)c->bmy-outline)*PLANEHEIGHT];
 			for (y = -outline; y < (int)bmh+outline; y++, out += PLANEWIDTH)
 				for (x = -outline; x < (int)bmw+outline; x++)
 				{
@@ -938,7 +948,7 @@ static struct charcache_s *Font_LoadGlyphData(font_t *f, CHARIDXTYPE charidx, FT
 		c->bmh += outline*2;
 	}
 
-	fontplanes.planechanged = true;
+	fontplanes->planechanged = true;
 	return c;
 }
 
@@ -1551,10 +1561,10 @@ static struct charcache_s *Font_GetChar(font_t *f, unsigned int codepoint)
 		{
 			static struct charcache_s tc;
 			tc.texplane = TRACKERIMAGE;
-			fontplanes.trackerimage = Font_GetTrackerImage(charidx-TRACKERFIRST);
-			if (!fontplanes.trackerimage)
+			fontplanes->trackerimage = Font_GetTrackerImage(charidx-TRACKERFIRST);
+			if (!fontplanes->trackerimage)
 				return Font_GetChar(f, '?');
-			tc.advance = fontplanes.trackerimage->width * ((float)f->charheight / fontplanes.trackerimage->height);
+			tc.advance = fontplanes->trackerimage->width * ((float)f->charheight / fontplanes->trackerimage->height);
 			return &tc;
 		}
 
@@ -2651,14 +2661,14 @@ struct font_s *Font_LoadFont(const char *fontfilename, float vheight, float scal
 	defaultplane = INVALIDPLANE;/*assume the bitmap plane - don't use the fallback as people don't think to use com_parseutf8*/
 	if (!explicit && TEXLOADED(f->singletexture))
 		defaultplane = BITMAPPLANE;
-	else if (TEXLOADED(fontplanes.defaultfont))
+	else if (TEXLOADED(fontplanes->defaultfont))
 		defaultplane = DEFAULTPLANE;
 
 	if (defaultplane == INVALIDPLANE)
 	{
-		if (!TEXLOADED(fontplanes.defaultfont))
+		if (!TEXLOADED(fontplanes->defaultfont))
 		{
-			fontplanes.defaultfont = Font_LoadDefaultConchars(&fmt);
+			fontplanes->defaultfont = Font_LoadDefaultConchars(&fmt);
 		}
 
 #ifdef HEXEN2
@@ -2669,11 +2679,11 @@ struct font_s *Font_LoadFont(const char *fontfilename, float vheight, float scal
 		}
 #endif
 		if (!TEXLOADED(f->singletexture))
-			f->singletexture = fontplanes.defaultfont;
+			f->singletexture = fontplanes->defaultfont;
 
 		if (TEXLOADED(f->singletexture))
 			defaultplane = BITMAPPLANE;
-		else if (TEXLOADED(fontplanes.defaultfont))
+		else if (TEXLOADED(fontplanes->defaultfont))
 			defaultplane = DEFAULTPLANE;
 	}
 
@@ -2776,14 +2786,14 @@ void Font_Free(struct font_s *f)
 	}
 	valid = NULL;
 	//walk all chars, unlinking any that appear to be within this font's char cache
-	for (link = &fontplanes.oldestchar; *link; )
+	for (link = &fontplanes->oldestchar; *link; )
 	{
 		c = *link;
 		if (f->chars[c->block] && c >= f->chars[c->block] && c <= f->chars[c->block] + FONTBLOCKSIZE)
 		{
 			c = c->nextchar;
 			if (!c)
-				fontplanes.newestchar = valid;
+				fontplanes->newestchar = valid;
 			*link = c;
 		}
 		else
@@ -3336,14 +3346,14 @@ int Font_DrawChar(int px, int py, unsigned int charflags, unsigned int codepoint
 		sy = ((py+c->top + dxbias)*(int)vid.height) / (float)vid.rotpixelheight;
 		sw = (c->advance*vid.width) / (float)vid.rotpixelwidth;
 		sh = (font->charheight*vid.height) / (float)vid.rotpixelheight;
-		v = Font_BeginChar(fontplanes.trackerimage);
+		v = Font_BeginChar(fontplanes->trackerimage);
 		break;
 	case DEFAULTPLANE:
 		sx = ((px+c->left + dxbias)*(int)vid.width) / (float)vid.rotpixelwidth;
 		sy = ((py+c->top + dxbias)*(int)vid.height) / (float)vid.rotpixelheight;
 		sw = ((c->advance)*vid.width) / (float)vid.rotpixelwidth;
 		sh = ((font->charheight)*vid.height) / (float)vid.rotpixelheight;
-		v = Font_BeginChar(fontplanes.defaultfont);
+		v = Font_BeginChar(fontplanes->defaultfont);
 		break;
 	case BITMAPPLANE:
 		sx = ((px+c->left + dxbias)*(int)vid.width) / (float)vid.rotpixelwidth;
@@ -3364,7 +3374,7 @@ int Font_DrawChar(int px, int py, unsigned int charflags, unsigned int codepoint
 		sy = ((py+c->top + dxbias)*(int)vid.height) / (float)vid.rotpixelheight;
 		sw = ((c->bmw)*vid.width) / (float)vid.rotpixelwidth;
 		sh = ((c->bmh)*vid.height) / (float)vid.rotpixelheight;
-		v = Font_BeginChar(fontplanes.texnum[c->texplane]);
+		v = Font_BeginChar(fontplanes->texnum[c->texplane]);
 		break;
 	}
 
@@ -3597,7 +3607,7 @@ float Font_DrawScaleChar(float px, float py, unsigned int charflags, unsigned in
 		sh = ((font->charheight*ch));
 
 		if (c->texplane == DEFAULTPLANE)
-			v = Font_BeginChar(fontplanes.defaultfont);
+			v = Font_BeginChar(fontplanes->defaultfont);
 		else
 			v = Font_BeginChar(font->singletexture);
 	}
@@ -3607,7 +3617,7 @@ float Font_DrawScaleChar(float px, float py, unsigned int charflags, unsigned in
 		sy = (py+c->top*ch);
 		sw = ((c->bmw*cw));
 		sh = ((c->bmh*ch));
-		v = Font_BeginChar(fontplanes.texnum[c->texplane]);
+		v = Font_BeginChar(fontplanes->texnum[c->texplane]);
 	}
 
 	sx += dxbias;

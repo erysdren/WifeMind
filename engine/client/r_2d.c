@@ -219,6 +219,8 @@ void R2D_Shutdown(void)
 	PR_ReloadFonts(false);
 #endif
 
+	Font_Shutdown();
+
 	while(atlas.pics)
 	{
 		apic_t *a = atlas.pics;
