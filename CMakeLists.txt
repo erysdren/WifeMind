@@ -90,11 +90,18 @@ set(FTE_COMMON_LINK_OPTIONS "")
 set(FTE_COMMON_OPTIONS "")
 set(FTE_COMMON_DEFINITIONS "")
 
+list(APPEND FTE_COMMON_OPTIONS
+	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release>>:-O3>
+	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:MinSizeRel>>:-Os>
+	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-O0>
+)
+
 list(APPEND FTE_COMMON_DEFINITIONS
 	$<$<CONFIG:Debug>:_DEBUG>
 )
 
 list(APPEND FTE_COMMON_LINK_OPTIONS
+	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release,MinSizeRel>>:-s>
 	$<$<BOOL:${MINGW}>:-static>
 	$<$<BOOL:${MINGW}>:-static-libgcc>
 	$<$<BOOL:${MINGW}>:-static-libstdc++>

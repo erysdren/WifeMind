@@ -279,8 +279,6 @@ if(FTE_ENGINE_CLIENT)
 	fte_add_common(fteqw)
 	target_compile_options(fteqw
 		PRIVATE
-			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release,MinSizeRel>>:-O3>
-			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-O0>
 			$<$<AND:$<BOOL:${EMSCRIPTEN}>,$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-gsource-map>
 	)
 	target_compile_definitions(fteqw
@@ -332,7 +330,6 @@ if(FTE_ENGINE_CLIENT)
 	)
 	target_link_options(fteqw
 		PRIVATE
-			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release,MinSizeRel>>:-s>
 			$<$<BOOL:${EMSCRIPTEN}>:--pre-js ${FTE_ENGINE_WEB_DIR}/prejs.js>
 			$<$<BOOL:${EMSCRIPTEN}>:--js-library ${FTE_ENGINE_WEB_DIR}/ftejslib.js>
 			$<$<BOOL:${EMSCRIPTEN}>:-sLEGACY_GL_EMULATION=0>
