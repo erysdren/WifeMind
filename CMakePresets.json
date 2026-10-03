@@ -76,6 +76,23 @@
 				"FTE_ENGINE_CLIENT": true,
 				"FTE_ENGINE_RENDERER": "pvr"
 			}
+		},
+		{
+			"name": "psp",
+			"displayName": "PSP",
+			"binaryDir": "build-psp",
+			"toolchainFile": "$env{PSPDEV}/psp/share/pspdev.cmake",
+			"cacheVariables": {
+				"FTE_ENGINE_USE_SDL": false,
+				"FTE_PLUGINS": false,
+				"FTE_TOOLS": false,
+				"BUILD_SHARED_LIBS": false,
+				"SKIP_INSTALL_ALL": true,
+				"FTE_VENDOR_DEPENDENCIES": true,
+				"FTE_ENGINE_SERVER": false,
+				"FTE_ENGINE_CLIENT": true,
+				"FTE_ENGINE_RENDERER": "gl"
+			}
 		}
 	],
 	"buildPresets": [
@@ -90,6 +107,8 @@
 		{ "name": "nxdk-debug", "configurePreset": "nxdk", "configuration": "Debug" },
 		{ "name": "nxdk-release", "configurePreset": "nxdk", "configuration": "Release" },
 		{ "name": "kos-debug", "configurePreset": "kos", "configuration": "Debug" },
-		{ "name": "kos-release", "configurePreset": "kos", "configuration": "Release" }
+		{ "name": "kos-release", "configurePreset": "kos", "configuration": "Release" },
+		{ "name": "psp-debug", "configurePreset": "psp", "configuration": "Debug" },
+		{ "name": "psp-release", "configurePreset": "psp", "configuration": "Release" }
 	]
 }

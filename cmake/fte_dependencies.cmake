@@ -53,7 +53,7 @@ if(FTE_ENGINE_USE_DXVK)
 	endif()
 endif()
 
-if(NXDK)
+if(NXDK OR PSP)
 	cmake_pkg_config(IMPORT zlib REQUIRED)
 	set(ZLIB_LIBRARY PkgConfig::zlib)
 	set(ZLIB_LIBRARIES PkgConfig::zlib)
