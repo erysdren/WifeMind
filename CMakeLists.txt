@@ -94,6 +94,7 @@ list(APPEND FTE_COMMON_OPTIONS
 	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release>>:-O3>
 	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:MinSizeRel>>:-Os>
 	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-O0>
+	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release,MinSizeRel>>:-fvisibility=hidden>
 )
 
 list(APPEND FTE_COMMON_DEFINITIONS
