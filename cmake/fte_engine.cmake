@@ -312,6 +312,7 @@ if(FTE_ENGINE_CLIENT)
 	target_link_libraries(fteqw
 		PRIVATE
 			${ZLIB_LIBRARIES}
+			$<$<BOOL:${FTE_ENGINE_USE_SQL}>:sqlite3>
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
 			$<TARGET_NAME_IF_EXISTS:freetype>
 			$<TARGET_NAME_IF_EXISTS:Ogg::ogg>

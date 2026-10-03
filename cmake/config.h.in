@@ -47,7 +47,6 @@
 #cmakedefine VERTEXINDEXBYTES @VERTEXINDEXBYTES@	//16bit indexes work everywhere but may break some file types, 32bit indexes are optional in gles<=2 and d3d<=9 and take more memory/copying but allow for bigger batches/models. Plugins need to be compiled the same way so this is no longer set per-renderer.
 #cmakedefine TEXTEDITOR								//my funky text editor! its awesome!
 #cmakedefine PLUGINS								//support for external plugins (like huds or fancy menus or whatever)
-#cmakedefine USE_SQLITE								//sql-database-as-file support
 #cmakedefine IPLOG									//track player's ip addresses (any decent server will hide ip addresses, so this probably isn't that useful, but nq players expect it)
 
 //Filesystem formats

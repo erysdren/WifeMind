@@ -37,7 +37,6 @@ set(MAX_SPLITS 4u CACHE STRING "") #
 set(VERTEXINDEXBYTES 2 CACHE STRING "") #16bit indexes work everywhere but may break some file types, 32bit indexes are optional in gles<=2 and d3d<=9 and take more memory/copying but allow for bigger batches/models. Plugins need to be compiled the same way so this is no longer set per-renderer.
 set(TEXTEDITOR TRUE CACHE STRING "") #my funky text editor! its awesome!
 set(PLUGINS TRUE CACHE STRING "") #support for external plugins (like huds or fancy menus or whatever)
-set(USE_SQLITE TRUE CACHE STRING "") #sql-database-as-file support
 set(IPLOG TRUE CACHE STRING "") #track player's ip addresses (any decent server will hide ip addresses, so this probably isn't that useful, but nq players expect it)
 
 # Filesystem formats

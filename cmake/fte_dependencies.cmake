@@ -282,6 +282,28 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 			endif()
 		endif()
 	endif()
+	if(FTE_ENGINE_USE_SQL)
+		if(FTE_VENDOR_DEPENDENCIES)
+			FetchContent_Declare(SQLite3
+				URL "https://www.sqlite.org/2026/sqlite-amalgamation-3530400.zip"
+				URL_HASH MD5=9af095f7326edd65e4b2f3b3382f8cfb
+				EXCLUDE_FROM_ALL
+				OVERRIDE_FIND_PACKAGE
+			)
+			FetchContent_MakeAvailable(SQLite3)
+			add_library(sqlite3 STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
+			target_include_directories(sqlite3 PUBLIC ${sqlite3_SOURCE_DIR})
+			list(APPEND FTE_COMMON_DEFINITIONS USE_SQLITE)
+		else()
+			find_package(SQLite3)
+			if(SQLite3_FOUND)
+				add_library(sqlite3 ALIAS SQLite3::SQLite3)
+				list(APPEND FTE_COMMON_DEFINITIONS USE_SQLITE)
+			else()
+				message(WARNING "SQLite not found, SQL databases will not be available")
+			endif()
+		endif()
+	endif()
 	if(FTE_ENGINE_USE_PNG)
 		if(FTE_VENDOR_DEPENDENCIES)
 			FetchContent_Declare(PNG
