@@ -83,7 +83,8 @@
 			"binaryDir": "build-psp",
 			"toolchainFile": "$env{PSPDEV}/psp/share/pspdev.cmake",
 			"cacheVariables": {
-				"FTE_ENGINE_USE_SDL": false,
+				"FTE_ENGINE_USE_SDL": true,
+				"FTE_ENGINE_SDL_VERSION_MAJOR": "3",
 				"FTE_PLUGINS": false,
 				"FTE_TOOLS": false,
 				"BUILD_SHARED_LIBS": false,

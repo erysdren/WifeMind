@@ -174,15 +174,19 @@ void *Z_TagMalloc(size_t size, int tag)
 }
 
 #ifdef USE_MSVCRT_DEBUG
-void *ZF_MallocNamed(int size, char *file, int line)
+void *ZF_MallocNamed(size_t size, const char *file, int line)
 {
+#ifdef _MSC_VER
 	return _calloc_dbg(size, 1, _NORMAL_BLOCK, file, line);
+#else
+	return calloc(size, 1);
+#endif
 }
-void *Z_MallocNamed(int size, char *file, int line)
+void *Z_MallocNamed(size_t size, const char *file, int line)
 {
 	void *mem = ZF_MallocNamed(size, file, line);
 	if (!mem)
-		Sys_Error("Z_Malloc: Failed on allocation of %i bytes", size);
+		Sys_Error("Z_Malloc: Failed on allocation of %i bytes\nfile: %s\nline: %d", size, file, line);
 
 	return mem;
 }
@@ -463,10 +467,14 @@ void *Z_Realloc(void *data, int newsize)
 */
 
 #ifdef USE_MSVCRT_DEBUG
-void *BZF_MallocNamed(int size, const char *file, int line)	//BZ_MallocNamed but allowed to fail - like straight malloc.
+void *BZF_MallocNamed(size_t size, const char *file, int line)	//BZ_MallocNamed but allowed to fail - like straight malloc.
 {
 	void *mem;
+#ifdef _MSC_VER
 	mem = _malloc_dbg(size, _NORMAL_BLOCK, file, line);
+#else
+	mem = malloc(size);
+#endif
 	if (mem)
 	{
 		zmemdelta += size;
@@ -489,11 +497,11 @@ void *BZF_Malloc(size_t size)	//BZ_Malloc but allowed to fail - like straight ma
 #endif
 
 #ifdef USE_MSVCRT_DEBUG
-void *BZ_MallocNamed(int size, const char *file, int line)	//BZ_MallocNamed but allowed to fail - like straight malloc.
+void *BZ_MallocNamed(size_t size, const char *file, int line)	//BZ_MallocNamed but allowed to fail - like straight malloc.
 {
 	void *mem = BZF_MallocNamed(size, file, line);
 	if (!mem)
-		Sys_Error("BZ_Malloc: Failed on allocation of %i bytes", size);
+		Sys_Error("BZ_Malloc: Failed on allocation of %i bytes\nfile: %s\nline: %d", size, file, line);
 
 	return mem;
 }
@@ -509,17 +517,21 @@ void *BZ_Malloc(size_t size)	//Doesn't clear. The expectation is a large file, r
 #endif
 
 #ifdef USE_MSVCRT_DEBUG
-void *BZF_ReallocNamed(void *data, int newsize, const char *file, int line)
+void *BZF_ReallocNamed(void *data, size_t newsize, const char *file, int line)
 {
+#ifdef _MSC_VER
 	return _realloc_dbg(data, newsize, _NORMAL_BLOCK, file, line);
+#else
+	return realloc(data, newsize);
+#endif
 }
 
-void *BZ_ReallocNamed(void *data, int newsize, const char *file, int line)
+void *BZ_ReallocNamed(void *data, size_t newsize, const char *file, int line)
 {
 	void *mem = BZF_ReallocNamed(data, newsize, file, line);
 
 	if (!mem)
-		Sys_Error("BZ_Realloc: Failed on reallocation of %i bytes", newsize);
+		Sys_Error("BZ_Realloc: Failed on reallocation of %i bytes\nfile: %s\nline: %d", newsize, file, line);
 
 	return mem;
 }
@@ -566,8 +578,8 @@ typedef struct zonegroupblock_s
 
 #ifdef USE_MSVCRT_DEBUG
 #undef ZG_Malloc
-void *QDECL ZG_Malloc(zonegroup_t *ctx, int size){return ZG_MallocNamed(ctx, size, "ZG_Malloc", size);}
-void *ZG_MallocNamed(zonegroup_t *ctx, int size, char *file, int line)
+void *QDECL ZG_Malloc(zonegroup_t *ctx, size_t size){return ZG_MallocNamed(ctx, size, "ZG_Malloc", size);}
+void *ZG_MallocNamed(zonegroup_t *ctx, size_t size, const char *file, int line)
 #else
 void *QDECL ZG_Malloc(zonegroup_t *ctx, size_t size)
 #endif
@@ -768,7 +780,7 @@ static void Hunk_Print_f (void)
 	}
 #endif
 
-#ifdef USE_MSVCRT_DEBUG
+#if defined(USE_MSVCRT_DEBUG) && defined(_MSC_VER)
 	{
 		static struct _CrtMemState savedstate;
 		static qboolean statesaved;

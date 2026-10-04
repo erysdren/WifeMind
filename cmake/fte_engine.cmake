@@ -352,6 +352,15 @@ if(FTE_ENGINE_CLIENT)
 			SUFFIX ${FTE_EXECUTABLE_SUFFIX}
 			OUTPUT_NAME ${FTE_ENGINE_CLIENT_NAME}
 	)
+	if(PSP)
+		create_pbp_file(
+			TARGET fteqw
+			ICON_PATH NULL
+			BACKGROUND_PATH NULL
+			PREVIEW_PATH NULL
+			TITLE "fteqw"
+		)
+	endif()
 endif()
 
 if(FTE_ENGINE_SERVER)

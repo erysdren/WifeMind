@@ -1444,6 +1444,10 @@ int QDECL main(int argc, char **argv)
 	parms.manifest = CONFIG_MANIFEST_TEXT;
 #endif
 
+#ifdef __PSP__
+#define O_NDELAY FNDELAY
+#endif
+
 #if !defined(WIN32)
 	fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | O_NDELAY);
 #endif

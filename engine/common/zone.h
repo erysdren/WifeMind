@@ -103,8 +103,8 @@ void Memory_DeInit(void);
 void VARGS Z_Free (void *ptr);
 void *Z_Malloc (size_t size); // returns 0 filled memory
 void *ZF_Malloc (size_t size); // allowed to fail
-void *Z_MallocNamed (size_t size, char *file, int line); // returns 0 filled memory
-void *ZF_MallocNamed (size_t size, char *file, int line); // allowed to fail
+void *Z_MallocNamed (size_t size, const char *file, int line); // returns 0 filled memory
+void *ZF_MallocNamed (size_t size, const char *file, int line); // allowed to fail
 //#define Z_Malloc(x) Z_MallocNamed2(x, __FILE__, __LINE__ )
 void *Z_TagMalloc (size_t size, int tag);
 void VARGS Z_TagFree(void *ptr);
@@ -132,9 +132,11 @@ typedef struct zonegroup_s
 	int totalbytes;	//combined size of all mallocs in this group
 } zonegroup_t;
 void *QDECL ZG_Malloc(zonegroup_t *ctx, size_t size);
-void *ZG_MallocNamed(zonegroup_t *ctx, size_t size, char *file, int line);
+void *ZG_MallocNamed(zonegroup_t *ctx, size_t size, const char *file, int line);
 void QDECL ZG_Free(zonegroup_t *ctx, void *ptr);
 void QDECL ZG_FreeGroup(zonegroup_t *ctx);
+
+//#define USE_MSVCRT_DEBUG
 
 #ifdef USE_MSVCRT_DEBUG
 #define BZ_Malloc(size) BZ_MallocNamed(size, __FILE__, __LINE__)

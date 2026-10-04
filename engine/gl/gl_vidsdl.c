@@ -396,7 +396,11 @@ static qboolean SDLVID_Init (rendererstate_t *info, unsigned char *palette, r_qr
 {
 	int flags = 0;
 #if SDL_VERSION_ATLEAST(2,0,0)
+#if SDL_VERSION_ATLEAST(3,0,0)
+	SDL_DisplayID display = -1;
+#else
 	int display = -1;
+#endif
 	SDL_DisplayMode modeinfo, *usemode;
 
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");		//we understand touch events. we do NOT want to get confused with mouse motion constantly warping.

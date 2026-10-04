@@ -1896,6 +1896,15 @@ void Plug_Shutdown(qboolean preliminary)
 	}
 }
 
+static void *Plug_Z_Malloc (size_t size)
+{
+	return Z_Malloc(size);
+}
+
+static void *Plug_BZ_Realloc(void *ptr, size_t size)
+{
+	return BZ_Realloc(ptr, size);
+}
 
 
 plugcorefuncs_t plugcorefuncs =
@@ -1913,8 +1922,8 @@ plugcorefuncs_t plugcorefuncs =
 	Sys_GetAddressForName,
 	Sys_CloseLibrary,
 
-	Z_Malloc,
-	BZ_Realloc,
+	Plug_Z_Malloc,
+	Plug_BZ_Realloc,
 	Z_Free,
 	ZG_Malloc,
 	ZG_Free,
