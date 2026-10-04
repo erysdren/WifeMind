@@ -56,6 +56,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#define HAVE_PACKET
 #endif
 
+#ifdef __PSP__
+#undef mips
+#endif
+
 #ifndef MULTITHREAD
 	#if !defined(_WIN32) || defined(FTE_SDL) //win32 is annoying
 		#define NO_MULTITHREAD

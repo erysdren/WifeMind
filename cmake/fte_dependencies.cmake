@@ -53,11 +53,14 @@ if(FTE_ENGINE_USE_DXVK)
 	endif()
 endif()
 
-if(NXDK OR PSP)
+if(NXDK)
 	cmake_pkg_config(IMPORT zlib REQUIRED)
+	set(ZLIB_INCLUDE_DIR "")
+	set(ZLIB_INCLUDE_DIRS "")
 	set(ZLIB_LIBRARY PkgConfig::zlib)
 	set(ZLIB_LIBRARIES PkgConfig::zlib)
-elseif(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN)
+	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_ZLIB)
+elseif(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN AND NOT PSP)
 	FetchContent_Declare(ZLIB
 		URL "https://zlib.net/zlib-1.3.2.tar.gz"
 		URL_HASH MD5=a1e6c958597af3c67d162995a342138a
