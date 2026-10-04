@@ -203,6 +203,9 @@ set(FTE_ENGINE_CLIENT_SOURCES
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_CLIENT_DIR}/sys_linux.c>
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_COMMON_DIR}/sys_linux_threads.c>
 
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${PSP}>>:${FTE_ENGINE_CLIENT_DIR}/sys_psp.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${PSP}>>:${FTE_ENGINE_CLIENT_DIR}/cd_null.c>
+
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_CLIENT_DIR}/cd_null.c>
 
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_GL_DIR}/gl_vidnt.c>
