@@ -1633,6 +1633,7 @@ TRACE(("dbg: R_ApplyRenderer: vid applied\n"));
 		r_deluxemapping = false;
 		r_lightprepass = false;
 
+		W_Init();
 		W_LoadWadFile("gfx.wad");
 TRACE(("dbg: R_ApplyRenderer: wad loaded\n"));
 		Image_Init();

@@ -30,10 +30,12 @@ qboolean Wad_NextDownload (void){return true;}
 void *W_GetLumpName (const char *name, size_t *size, qbyte *type) {return NULL;}
 qbyte *W_GetTexture(const char *name, int *width, int *height, uploadfmt_t *format){return NULL;}
 void W_LoadWadFile (char *filename){}
+void W_Init (void){}
 void W_Shutdown (void){}
 void CL_Skygroup_f(void){}
 #else
 
+cvar_t		r_wadtextures = CVARD("r_wadtextures", "0", "If 1, ignore embedded BSP textures and load WAD files listed in the worldspawn 'wad' key.");
 int			wad_numlumps;
 lumpinfo_t	*wad_lumps;
 qbyte		*wad_base;
@@ -78,6 +80,11 @@ void W_CleanupName (const char *in, char *out)
 		out[i] = 0;
 }
 
+void W_Init (void)
+{
+#define WADOPTIONS "WAD File Options"
+	Cvar_Register(&r_wadtextures, WADOPTIONS);
+}
 
 void W_Shutdown (void)
 {

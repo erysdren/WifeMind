@@ -92,6 +92,7 @@ extern	int			wad_numlumps;
 extern	lumpinfo_t	*wad_lumps;
 extern	qbyte		*wad_base;
 
+void W_Init (void);
 void W_Shutdown (void);
 void	W_LoadWadFile (char *filename);
 void	W_CleanupName (const char *in, char *out);
