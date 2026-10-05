@@ -151,8 +151,8 @@ BEGIN
             VALUE "CompanyName", DISTRIBUTIONLONG
             VALUE "FileDescription", FULLENGINENAME
 			VALUE "FileVersion", V_STR V_SUFFIX
-            VALUE "InternalName", "ftequake"
-            VALUE "LegalCopyright", "Copyright (C) 2011"
+            VALUE "InternalName", "bitchhell"
+            VALUE "LegalCopyright", "Copyright (C) 2022-2026"
             VALUE "ProductName", FULLENGINENAME
 			VALUE "ProductVersion", V_STR V_SUFFIX
         END

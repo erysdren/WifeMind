@@ -109,7 +109,7 @@ list(APPEND FTE_COMMON_LINK_OPTIONS
 	$<$<BOOL:${MINGW}>:-static>
 	$<$<BOOL:${MINGW}>:-static-libgcc>
 	$<$<BOOL:${MINGW}>:-static-libstdc++>
-	$<$<BOOL:${MINGW}>:-mcrtdll=msvcrt20> # was msvcrt-os
+	$<$<BOOL:${MINGW}>:-mcrtdll=msvcrt-os> # was msvcrt-os
 )
 
 list(APPEND FTE_COMMON_DEFINITIONS

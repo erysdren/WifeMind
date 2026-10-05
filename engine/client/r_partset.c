@@ -4,7 +4,6 @@ YOU SHOULD NOT EDIT THIS FILE BY HAND
 */
 
 #include "bothdefs.h"
-#ifndef QUAKETC
 #include "r_partset.h"
 
 
@@ -4882,4 +4881,3 @@ char *particle_set_tsshaft =
 "assoc lflash\n"
 "}\n"
 ;
-#endif

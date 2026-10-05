@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // release version
 #define FTE_VER_MAJOR 1
-#define FTE_VER_MINOR 7
+#define FTE_VER_MINOR 2
 
 #if defined(FTE_SDL3) && !defined(FTE_SDL)	//sdl3 uses different include names, so we need two defines
 	#define FTE_SDL		//but I'm too lazy to constantly test both.
