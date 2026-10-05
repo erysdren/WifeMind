@@ -136,7 +136,9 @@ void *ZG_MallocNamed(zonegroup_t *ctx, size_t size, const char *file, int line);
 void QDECL ZG_Free(zonegroup_t *ctx, void *ptr);
 void QDECL ZG_FreeGroup(zonegroup_t *ctx);
 
-//#define USE_MSVCRT_DEBUG
+#ifdef __PSP__
+#define USE_MSVCRT_DEBUG
+#endif
 
 #ifdef USE_MSVCRT_DEBUG
 #define BZ_Malloc(size) BZ_MallocNamed(size, __FILE__, __LINE__)

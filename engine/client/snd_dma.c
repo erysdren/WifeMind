@@ -68,7 +68,11 @@ static struct listener_s
 } listener[MAX_SPLITS];
 cvar_t snd_nominaldistance		= CVARAFD("s_nominaldistance", "1000", "snd_soundradius", CVAR_CHEAT, "This cvar defines how far an attenuation=1 sound can be heard.");
 
+#ifdef __PSP__
+#define	MAX_SFX		256
+#else
 #define	MAX_SFX		8192
+#endif
 sfx_t		*known_sfx;		// hunk allocated [MAX_SFX]
 int			num_sfx;
 
