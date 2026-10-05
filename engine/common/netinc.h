@@ -228,8 +228,10 @@
 #ifndef INVALID_SOCKET
 	#define INVALID_SOCKET -1
 #endif
+#if 0
 #ifndef MSG_NOSIGNAL
 	#define MSG_NOSIGNAL	0	//available on linux, no idea about other unixes. don't bug out too much... (d)tls needs this to not get constant SIGPIPE errors
+#endif
 #endif
 
 #ifndef INADDR_LOOPBACK

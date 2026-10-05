@@ -5989,6 +5989,7 @@ static void Sys_FindBaseDirs(const char *poshname, const char *gamename, void (*
 #else
 #if (defined(__linux__) || defined(__unix__) || defined(__apple__)) && !defined(ANDROID)
 #include <sys/stat.h>
+#include <unistd.h>
 
 static qboolean Sys_SteamLibraryHasFile(char *basepath, int basepathlen, char *librarypath, char *steamdir, char *fname)	//returns the base system path
 {
