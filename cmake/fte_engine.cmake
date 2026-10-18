@@ -2,6 +2,69 @@ if(NOT FTE_ENGINE)
 	return()
 endif()
 
+# regenerate vulkan shader blobs
+
+if(0)
+add_executable(fteqw-makevulkanblob
+	${FTE_ENGINE_SHADERS_DIR}/makevulkanblob.c
+)
+
+file(GLOB_RECURSE fte_vulkan_shader_files LIST_DIRECTORIES FALSE
+	"${FTE_ENGINE_SHADERS_DIR}/vulkan/*.glsl"
+	"${FTE_ENGINE_SHADERS_DIR}/vulkan/*.h"
+)
+
+add_custom_target(fteqw-regenerate-vulkan-blobs)
+
+foreach(shaderfile IN LISTS fte_vulkan_shader_files)
+	set(shaderblob ${shaderfile})
+	cmake_path(REPLACE_EXTENSION shaderblob ".fvb")
+	cmake_path(GET shaderblob ROOT_PATH shaderpath)
+	cmake_path(GET shaderblob STEM shaderstem)
+	set(rqshaderblob "${shaderpath}/rq_${shaderstem}.fvb")
+	add_custom_command(
+		OUTPUT ${shaderblob}
+		DEPENDS fteqw-makevulkanblob
+		COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-makevulkanblob>" ${shaderfile} ${shaderblob}
+		WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
+	)
+	add_custom_command(
+		OUTPUT ${rqshaderblob}
+		DEPENDS fteqw-makevulkanblob
+		COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-makevulkanblob>" ${shaderfile} ${rqshaderblob} rq
+		WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
+	)
+	add_custom_target(fteqw-regenerate-vulkan-${shaderstem} DEPENDS ${shaderblob} ${rqshaderblob})
+	add_dependencies(fteqw-regenerate-vulkan-blobs fteqw-regenerate-vulkan-${shaderstem})
+endforeach()
+endif()
+
+# regenerate bishaders header
+
+if(0)
+add_executable(fteqw-generatebuiltinsl
+	${FTE_ENGINE_SHADERS_DIR}/generatebuiltinsl.c
+)
+
+add_custom_command(
+	OUTPUT ${FTE_ENGINE_GL_DIR}/r_bishaders.h
+	DEPENDS fteqw-generatebuiltinsl
+	COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-generatebuiltinsl>" ${FTE_ENGINE_GL_DIR}/r_bishaders.h
+	WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
+)
+add_custom_target(fteqw-regenerate-shaders DEPENDS ${FTE_ENGINE_GL_DIR}/r_bishaders.h)
+
+file(GLOB_RECURSE fte_shader_files LIST_DIRECTORIES FALSE
+	"${FTE_ENGINE_SHADERS_DIR}/*.glsl"
+	"${FTE_ENGINE_SHADERS_DIR}/*.hlsl"
+	"${FTE_ENGINE_SHADERS_DIR}/*.h"
+)
+
+foreach(shaderfile IN LISTS fte_shader_files)
+	set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${shaderfile})
+endforeach()
+endif()
+
 set(FTE_ENGINE_COMMON_SOURCES
 	${FTE_ENGINE_GL_DIR}/gl_alias.c
 	${FTE_ENGINE_GL_DIR}/gl_hlmdl.c
@@ -352,6 +415,7 @@ if(FTE_ENGINE_CLIENT)
 			SUFFIX ${FTE_EXECUTABLE_SUFFIX}
 			OUTPUT_NAME ${FTE_ENGINE_CLIENT_NAME}
 	)
+	# add_dependencies(fteqw fteqw-regenerate-shaders)
 	if(PSP)
 		create_pbp_file(
 			TARGET fteqw
