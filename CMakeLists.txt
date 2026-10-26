@@ -28,7 +28,7 @@ include(CMakeDependentOption)
 
 option(FTE_TOOLS "Build tools" ON)
 cmake_dependent_option(FTE_TOOL_QTV "Build fteqtv" OFF FTE_TOOLS OFF) # NOTE: seems unfinished
-cmake_dependent_option(FTE_TOOL_IMG "Build imgtool" OFF FTE_TOOLS OFF) # NOTE: currently broken
+cmake_dependent_option(FTE_TOOL_IMG "Build imgtool" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_IQM "Build iqmtool" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_ASM "Build q3asm2" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_QCC "Build fteqcc" ON FTE_TOOLS OFF)

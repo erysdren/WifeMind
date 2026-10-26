@@ -6,7 +6,31 @@ fte_add_tool(imgtool
 	SOURCES
 		${FTE_TOOLS_ROOT_DIR}/imgtool/imgtool.c
 		${FTE_ENGINE_CLIENT_DIR}/image.c
+		${FTE_ENGINE_CLIENT_DIR}/image_blp.c
+		${FTE_ENGINE_CLIENT_DIR}/image_bmp.c
+		${FTE_ENGINE_CLIENT_DIR}/image_dds.c
+		${FTE_ENGINE_CLIENT_DIR}/image_exr.c
+		${FTE_ENGINE_CLIENT_DIR}/image_hdr.c
+		${FTE_ENGINE_CLIENT_DIR}/image_ktx.c
+		${FTE_ENGINE_CLIENT_DIR}/image_pbm.c
+		${FTE_ENGINE_CLIENT_DIR}/image_pcx.c
+		${FTE_ENGINE_CLIENT_DIR}/image_psd.c
+		${FTE_ENGINE_CLIENT_DIR}/image_pvr.c
+		${FTE_ENGINE_CLIENT_DIR}/image_tga.c
+		${FTE_ENGINE_CLIENT_DIR}/image_xcf.c
 )
-target_link_libraries(imgtool PRIVATE $<TARGET_NAME_IF_EXISTS:Math::Math>)
-target_include_directories(imgtool PRIVATE ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_GL_DIR})
-target_compile_definitions(imgtool PRIVATE IMGTOOL)
+target_link_libraries(imgtool
+	PRIVATE
+		$<TARGET_NAME_IF_EXISTS:PNG::PNG>
+		$<TARGET_NAME_IF_EXISTS:Math::Math>
+)
+target_include_directories(imgtool
+	PRIVATE
+		${FTE_ENGINE_COMMON_DIR}
+		${FTE_ENGINE_CLIENT_DIR}
+		${FTE_ENGINE_GL_DIR}
+)
+target_compile_definitions(imgtool
+	PRIVATE
+		IMGTOOL
+)
