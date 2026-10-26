@@ -82,7 +82,7 @@ set(RAGDOLL TRUE CACHE STRING "") #ragdoll support. requires RBE support (via a 
 set(IMAGEFMT_KTX TRUE CACHE STRING "") #Khronos TeXture. common on gles3 devices for etc2 compression
 set(IMAGEFMT_PKM TRUE CACHE STRING "") #file format generally written by etcpack or android's etc1tool. doesn't support mips.
 set(IMAGEFMT_ASTC TRUE CACHE STRING "") #lame simple header around a single astc image. not needed for astc in ktx files etc. its better to use ktx files.
-set(IMAGEFMT_PBM TRUE CACHE STRING "") #pbm/ppm/pgm/pfm family formats.
+set(IMAGEFMT_PBM FALSE CACHE STRING "") #pbm/ppm/pgm/pfm family formats.
 set(IMAGEFMT_PSD TRUE CACHE STRING "") #baselayer only.
 set(IMAGEFMT_XCF TRUE CACHE STRING "") #flattens, most of the time
 set(IMAGEFMT_HDR TRUE CACHE STRING "") #an RGBE format.
