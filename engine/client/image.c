@@ -7804,19 +7804,17 @@ static qboolean Image_GenMip0(struct pendingtextureinfo *mips, unsigned int flag
 		case PTI_ASTC_6X6X6_SRGB:
 		case PTI_ASTC_6X6X6_LDR:
 #endif
-#ifdef PVRQUAKE
-		case PTI_ARGB1555_VQ:
+
+		//dreamcast pvr specific formats
 		case PTI_ARGB1555_TWIDDLED:
-		case PTI_ARGB1555_VQ_TWIDDLED:
-		case PTI_RGB565_VQ:
+		case PTI_ARGB1555_TWIDDLED_VQ:
 		case PTI_RGB565_TWIDDLED:
-		case PTI_RGB565_VQ_TWIDDLED:
-		case PTI_ARGB4444_VQ:
+		case PTI_RGB565_TWIDDLED_VQ:
 		case PTI_ARGB4444_TWIDDLED:
-		case PTI_ARGB4444_VQ_TWIDDLED:
+		case PTI_ARGB4444_TWIDDLED_VQ:
 		case PTI_P4_TWIDDLED:
 		case PTI_P8_TWIDDLED:
-#endif
+
 #ifdef FTE_TARGET_WEB
 		case PTI_WHOLEFILE:
 #endif
