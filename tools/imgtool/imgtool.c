@@ -674,6 +674,18 @@ static qboolean ImgTool_ConvertPixelFormat(struct opts_s *args, const char *inna
 		Q_snprintfz(command, sizeof(command), "astcenc -c");
 		canktx = true;
 	}
+	else if (targfmt == PTI_ARGB1555_TW)
+		Q_snprintfz(command, sizeof(command), "pvrtool -TW -CF 1555");
+	else if (targfmt == PTI_ARGB1555_TW_VQ)
+		Q_snprintfz(command, sizeof(command), "pvrtool -TW -VQ -CF 1555");
+	else if (targfmt == PTI_RGB565_TW)
+		Q_snprintfz(command, sizeof(command), "pvrtool -TW -CF 565");
+	else if (targfmt == PTI_RGB565_TW_VQ)
+		Q_snprintfz(command, sizeof(command), "pvrtool -TW -VQ -CF 565");
+	else if (targfmt == PTI_ARGB4444_TW)
+		Q_snprintfz(command, sizeof(command), "pvrtool -TW -CF 4444");
+	else if (targfmt == PTI_ARGB4444_TW_VQ)
+		Q_snprintfz(command, sizeof(command), "pvrtool -TW -VQ -CF 4444");
 	else if (targfmt == PTI_BC1_RGB)
 		Q_snprintfz(command, sizeof(command), "nvcompress -bc1%s", (args->flags&IF_TRYBUMP)?"n":"");
 	else if (targfmt == PTI_BC1_RGB_SRGB)
@@ -2822,6 +2834,8 @@ showhelp:
 						Con_Printf(" --%-16s %5.3g-bpp (requires nvcompress)\n", Image_FormatName(f), 8*(float)bb/(bw*bh*bd));
 					else if (f==PTI_BC6_RGB_UFLOAT || f==PTI_BC6_RGB_SFLOAT || f==PTI_BC7_RGBA)
 						Con_Printf(" --%-16s %5.3g-bpp (requires nvcompress 2.1+)\n", Image_FormatName(f), 8*(float)bb/(bw*bh*bd));
+					else if (f>=PTI_ARGB1555_TW && f<=PTI_ARGB4444_TW_VQ)
+						Con_Printf(" --%-16s %5.3g-bpp (requires pvrtool)\n", Image_FormatName(f), 8*(float)bb/(bw*bh*bd));
 					else if (	f==PTI_RGBA16F ||
 								f==PTI_RGBA32F ||
 								f==PTI_E5BGR9 ||
@@ -3009,6 +3023,8 @@ showhelp:
 			args.defaultext = "png";	//something the user expects to be able to view easily (and lossless)
 		else if (args.newpixelformat >= PTI_BC1_RGB && args.newpixelformat < PTI_BC4_R)
 			args.defaultext = "dds";
+		else if (args.newpixelformat >= PTI_ARGB1555_TW && args.newpixelformat <= PTI_ARGB4444_TW_VQ)
+			args.defaultext = "pvr";
 		else
 			args.defaultext = "ktx";
 	}
