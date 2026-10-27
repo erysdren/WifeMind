@@ -1,5 +1,6 @@
 #include "quakedef.h"
 #include "shader.h"
+#include "image.h"
 #undef stderr
 #define stderr stdout
 
@@ -1145,12 +1146,12 @@ static void ImgTool_Convert(struct opts_s *args, struct pendingtextureinfo *in, 
 
 
 	outext = COM_GetFileExtension(outname, NULL);
-	if (!strcmp(outext, ".dds") || !strcmp(outext, ".ktx"))
+	if (!strcmp(outext, ".dds") || !strcmp(outext, ".ktx") || !strcmp(outext, ".pvr"))
 		allowcompressed = true;
 
 	if (in)
 	{
-		if (!strcmp(outext, ".ktx") || !strcmp(outext, ".dds") || args->mipnum >= in->mipcount)
+		if (!strcmp(outext, ".ktx") || !strcmp(outext, ".dds") || !strcmp(outext, ".pvr") || args->mipnum >= in->mipcount)
 		{
 			if (!(args->flags & IF_NOMIPMAP) && in->mipcount == 1)
 				Image_GenerateMips(in, args->flags);
@@ -1200,6 +1201,13 @@ static void ImgTool_Convert(struct opts_s *args, struct pendingtextureinfo *in, 
 		else if (!strcasecmp(outext, ".dds"))
 		{
 			if (!Image_WriteDDSFile(outname, FS_SYSTEM, in))
+				Con_Printf("%s(%s): Write failed\n", outname, Image_FormatName(in->encoding));
+		}
+#endif
+#ifdef IMAGEFMT_PVR
+		else if (!strcasecmp(outext, ".pvr"))
+		{
+			if (!Image_WritePVRFile(outname, FS_SYSTEM, in))
 				Con_Printf("%s(%s): Write failed\n", outname, Image_FormatName(in->encoding));
 		}
 #endif
