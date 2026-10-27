@@ -3,12 +3,12 @@
 #ifdef IMAGEFMT_PVR
 
 typedef struct gbix {
-	uint32_t magic;
+	char magic[4];
 	uint32_t len;
 } gbix_t;
 
 typedef struct pvr {
-	uint32_t magic;
+	char magic[4];
 	uint32_t len_file;
 	uint32_t type;
 	uint16_t width;
@@ -21,7 +21,11 @@ typedef qbyte *(*pvr_image_func_t)(pvr_t *pvr, int offset, qboolean detwiddle, p
 enum {
 	PVR_PIXEL_TYPE_ARGB1555 = 0,
 	PVR_PIXEL_TYPE_RGB565 = 1,
-	PVR_PIXEL_TYPE_ARGB4444 = 2
+	PVR_PIXEL_TYPE_ARGB4444 = 2,
+	PVR_PIXEL_TYPE_YUV422 = 3,
+	PVR_PIXEL_TYPE_BUMP = 4,
+	PVR_PIXEL_TYPE_RGB555 = 5,
+	PVR_PIXEL_TYPE_YUV420 = 6
 };
 
 enum {
@@ -29,8 +33,19 @@ enum {
 	PVR_IMAGE_TYPE_TWIDDLED_MM = 2,
 	PVR_IMAGE_TYPE_VQ = 3,
 	PVR_IMAGE_TYPE_VQ_MM = 4,
+	PVR_IMAGE_TYPE_PAL4 = 5,
+	PVR_IMAGE_TYPE_PAL4_MM = 6,
+	PVR_IMAGE_TYPE_PAL8 = 7,
+	PVR_IMAGE_TYPE_PAL8_MM = 8,
 	PVR_IMAGE_TYPE_RECTANGULAR = 9,
-	PVR_IMAGE_TYPE_RECTANGULAR_MM = 10
+	PVR_IMAGE_TYPE_RECTANGULAR_MM = 10,
+	PVR_IMAGE_TYPE_STRIDE = 11,
+	PVR_IMAGE_TYPE_STRIDE_MM = 12,
+	PVR_IMAGE_TYPE_RECTANGULAR_TWIDDLED = 13,
+	PVR_IMAGE_TYPE_BMP = 14,
+	PVR_IMAGE_TYPE_BMP_MM = 15,
+	PVR_IMAGE_TYPE_SMALLVQ = 16,
+	PVR_IMAGE_TYPE_SMALLVQ_MM = 17
 };
 
 static int pvr_log2(int x)
@@ -369,6 +384,93 @@ qbyte *ReadPVRFile(qbyte *buf, int len, int *width, int *height, uploadfmt_t *fo
 		}
 	}
 	return ret;
+}
+
+qboolean Image_WritePVRFile(const char *filename, enum fs_relative fsroot, struct pendingtextureinfo *mips)
+{
+	unsigned int i, j;
+	unsigned int bb, bw, bh, bd;
+	unsigned int mipCount;
+	unsigned int pixelType, imageType;
+	qboolean isVQ, isTwiddled, isPaletted;
+	vfsfile_t *file;
+	pvr_t header = {
+		{'P', 'V', 'R', 'T'},
+		0,
+		0,
+		mips->mip[0].width,
+		mips->mip[0].height
+	};
+
+	// only 2d textures accepted
+	if (mips->type != PTI_2D)
+		return false;
+
+	// only supports up to 4 mips
+	mipCount = mips->mipcount;
+	if (mipCount > 4)
+		mipCount = 4;
+	else if (mipCount != 4)
+		mipCount = 1;
+
+	isPaletted = mips->encoding == PTI_P4_TWIDDLED || mips->encoding == PTI_P8_TWIDDLED;
+	isVQ = mips->encoding == PTI_ARGB1555_TWIDDLED_VQ || mips->encoding == PTI_RGB565_TWIDDLED_VQ || mips->encoding == PTI_ARGB4444_TWIDDLED_VQ;
+	isTwiddled = isPaletted || isVQ || mips->encoding == PTI_ARGB1555_TWIDDLED || mips->encoding == PTI_RGB565_TWIDDLED || mips->encoding == PTI_ARGB4444_TWIDDLED;
+
+	// determine imageType
+	if (isPaletted) {
+		if (mips->encoding == PTI_P4_TWIDDLED) {
+			imageType = mipCount > 1 ? PVR_IMAGE_TYPE_PAL4_MM : PVR_IMAGE_TYPE_PAL4;
+		} else if (mips->encoding == PTI_P8_TWIDDLED) {
+			imageType = mipCount > 1 ? PVR_IMAGE_TYPE_PAL8_MM : PVR_IMAGE_TYPE_PAL8;
+		}
+	} else if (isVQ) {
+		imageType = mipCount > 1 ? PVR_IMAGE_TYPE_VQ_MM : PVR_IMAGE_TYPE_VQ;
+	} else if (isTwiddled) {
+		imageType = mipCount > 1 ? PVR_IMAGE_TYPE_TWIDDLED_MM : PVR_IMAGE_TYPE_TWIDDLED;
+	} else {
+		imageType = mipCount > 1 ? PVR_IMAGE_TYPE_RECTANGULAR_MM : PVR_IMAGE_TYPE_RECTANGULAR;
+	}
+
+	// determine pixelType
+	if (mips->encoding == PTI_ARGB1555 || mips->encoding == PTI_ARGB1555_TWIDDLED || mips->encoding == PTI_ARGB1555_TWIDDLED_VQ) {
+		pixelType = PVR_PIXEL_TYPE_ARGB1555;
+	} else if (mips->encoding == PTI_RGB565 || mips->encoding == PTI_RGB565_TWIDDLED || mips->encoding == PTI_RGB565_TWIDDLED_VQ) {
+		pixelType = PVR_PIXEL_TYPE_RGB565;
+	} else if (mips->encoding == PTI_ARGB4444 || mips->encoding == PTI_ARGB4444_TWIDDLED || mips->encoding == PTI_ARGB4444_TWIDDLED_VQ) {
+		pixelType = PVR_PIXEL_TYPE_ARGB4444;
+	} else {
+		return false;
+	}
+
+	// write type value to header
+	header.type = ((imageType & 0xFF) << 8) | (pixelType & 0xFF);
+
+	// figure out filesize for header
+	Image_BlockSizeForEncoding(mips->encoding, &bb, &bw, &bh, &bd);
+	header.len_file = sizeof(uint32_t) + (sizeof(uint16_t) * 2);
+	for (i = 0; i < mipCount; i++)
+	{
+		unsigned int browbytes = bb * ((mips->mip[i].width+bw-1)/bh);
+		unsigned int brows = (mips->mip[i].height+bh-1)/bh;
+		header.len_file += browbytes*brows;
+	}
+
+	// write header
+	file = FS_OpenVFS(filename, "wb", fsroot);
+	if (!file)
+		return false;
+	VFS_WRITE(file, &header, sizeof(header));
+
+	// write image data
+	for (i = 0; i < mipCount; i++)
+	{
+		unsigned int browbytes = bb * ((mips->mip[i].width+bw-1)/bh);
+		unsigned int brows = (mips->mip[i].height+bh-1)/bh;
+		VFS_WRITE(file, mips->mip[i].data, browbytes*brows);
+	}
+
+	return true;
 }
 
 #endif // IMAGEFMT_PVR

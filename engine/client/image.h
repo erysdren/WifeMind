@@ -63,6 +63,7 @@ void *ReadPSDFile(qbyte *buf, size_t len, const char *fname, int *outwidth, int 
 
 #ifdef IMAGEFMT_PVR
 // image_pvr.c
+qboolean Image_WritePVRFile(const char *filename, enum fs_relative fsroot, struct pendingtextureinfo *mips);
 qbyte *ReadPVRFile(qbyte *buf, int len, int *width, int *height, uploadfmt_t *format, qboolean force_rgba8);
 #endif
 
