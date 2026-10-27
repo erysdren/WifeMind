@@ -218,14 +218,12 @@ qboolean Image_WriteKTXFile(const char *filename, enum fs_relative fsroot, struc
 	case PTI_DEPTH24_8:			header.glinternalformat = 0x88F0/*GL_DEPTH24_STENCIL8*/;	header.glbaseinternalformat = 0x84F9/*GL_DEPTH_STENCIL*/;	header.glformat = 0x84F9/*GL_DEPTH_STENCIL*/;	header.gltype = 0x84FA/*GL_UNSIGNED_INT_24_8*/;				header.gltypesize = 4; break;
 
 	//dreamcast pvr specific formats
-	case PTI_ARGB1555_TWIDDLED:
-	case PTI_ARGB1555_TWIDDLED_VQ:
-	case PTI_RGB565_TWIDDLED:
-	case PTI_RGB565_TWIDDLED_VQ:
-	case PTI_ARGB4444_TWIDDLED:
-	case PTI_ARGB4444_TWIDDLED_VQ:
-	case PTI_P4_TWIDDLED:
-	case PTI_P8_TWIDDLED:
+	case PTI_ARGB1555_TW:
+	case PTI_ARGB1555_TW_VQ:
+	case PTI_RGB565_TW:
+	case PTI_RGB565_TW_VQ:
+	case PTI_ARGB4444_TW:
+	case PTI_ARGB4444_TW_VQ:
 
 #ifdef FTE_TARGET_WEB
 	case PTI_WHOLEFILE:

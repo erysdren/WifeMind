@@ -41,7 +41,7 @@ enum {
 	PVR_IMAGE_TYPE_RECTANGULAR_MM = 10,
 	PVR_IMAGE_TYPE_STRIDE = 11,
 	PVR_IMAGE_TYPE_STRIDE_MM = 12,
-	PVR_IMAGE_TYPE_RECTANGULAR_TWIDDLED = 13,
+	PVR_IMAGE_TYPE_RECTANGULAR_TW = 13,
 	PVR_IMAGE_TYPE_BMP = 14,
 	PVR_IMAGE_TYPE_BMP_MM = 15,
 	PVR_IMAGE_TYPE_SMALLVQ = 16,
@@ -392,7 +392,7 @@ qboolean Image_WritePVRFile(const char *filename, enum fs_relative fsroot, struc
 	unsigned int bb, bw, bh, bd;
 	unsigned int mipCount;
 	unsigned int pixelType, imageType;
-	qboolean isVQ, isTwiddled, isPaletted;
+	qboolean isVQ, isTwiddled;
 	vfsfile_t *file;
 	pvr_t header = {
 		{'P', 'V', 'R', 'T'},
@@ -413,18 +413,11 @@ qboolean Image_WritePVRFile(const char *filename, enum fs_relative fsroot, struc
 	else if (mipCount != 4)
 		mipCount = 1;
 
-	isPaletted = mips->encoding == PTI_P4_TWIDDLED || mips->encoding == PTI_P8_TWIDDLED;
-	isVQ = mips->encoding == PTI_ARGB1555_TWIDDLED_VQ || mips->encoding == PTI_RGB565_TWIDDLED_VQ || mips->encoding == PTI_ARGB4444_TWIDDLED_VQ;
-	isTwiddled = isPaletted || isVQ || mips->encoding == PTI_ARGB1555_TWIDDLED || mips->encoding == PTI_RGB565_TWIDDLED || mips->encoding == PTI_ARGB4444_TWIDDLED;
+	isVQ = mips->encoding == PTI_ARGB1555_TW_VQ || mips->encoding == PTI_RGB565_TW_VQ || mips->encoding == PTI_ARGB4444_TW_VQ;
+	isTwiddled = isVQ || mips->encoding == PTI_ARGB1555_TW || mips->encoding == PTI_RGB565_TW || mips->encoding == PTI_ARGB4444_TW;
 
 	// determine imageType
-	if (isPaletted) {
-		if (mips->encoding == PTI_P4_TWIDDLED) {
-			imageType = mipCount > 1 ? PVR_IMAGE_TYPE_PAL4_MM : PVR_IMAGE_TYPE_PAL4;
-		} else if (mips->encoding == PTI_P8_TWIDDLED) {
-			imageType = mipCount > 1 ? PVR_IMAGE_TYPE_PAL8_MM : PVR_IMAGE_TYPE_PAL8;
-		}
-	} else if (isVQ) {
+	if (isVQ) {
 		imageType = mipCount > 1 ? PVR_IMAGE_TYPE_VQ_MM : PVR_IMAGE_TYPE_VQ;
 	} else if (isTwiddled) {
 		imageType = mipCount > 1 ? PVR_IMAGE_TYPE_TWIDDLED_MM : PVR_IMAGE_TYPE_TWIDDLED;
@@ -433,11 +426,11 @@ qboolean Image_WritePVRFile(const char *filename, enum fs_relative fsroot, struc
 	}
 
 	// determine pixelType
-	if (mips->encoding == PTI_ARGB1555 || mips->encoding == PTI_ARGB1555_TWIDDLED || mips->encoding == PTI_ARGB1555_TWIDDLED_VQ) {
+	if (mips->encoding == PTI_ARGB1555 || mips->encoding == PTI_ARGB1555_TW || mips->encoding == PTI_ARGB1555_TW_VQ) {
 		pixelType = PVR_PIXEL_TYPE_ARGB1555;
-	} else if (mips->encoding == PTI_RGB565 || mips->encoding == PTI_RGB565_TWIDDLED || mips->encoding == PTI_RGB565_TWIDDLED_VQ) {
+	} else if (mips->encoding == PTI_RGB565 || mips->encoding == PTI_RGB565_TW || mips->encoding == PTI_RGB565_TW_VQ) {
 		pixelType = PVR_PIXEL_TYPE_RGB565;
-	} else if (mips->encoding == PTI_ARGB4444 || mips->encoding == PTI_ARGB4444_TWIDDLED || mips->encoding == PTI_ARGB4444_TWIDDLED_VQ) {
+	} else if (mips->encoding == PTI_ARGB4444 || mips->encoding == PTI_ARGB4444_TW || mips->encoding == PTI_ARGB4444_TW_VQ) {
 		pixelType = PVR_PIXEL_TYPE_ARGB4444;
 	} else {
 		return false;

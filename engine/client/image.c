@@ -5955,6 +5955,16 @@ void Image_BlockSizeForEncoding(uploadfmt_t encoding, unsigned int *blockbytes, 
 		b = 4;
 		break;
 
+	//dreamcast pvr specific formats
+	case PTI_ARGB1555_TW:
+	case PTI_ARGB1555_TW_VQ:
+	case PTI_RGB565_TW:
+	case PTI_RGB565_TW_VQ:
+	case PTI_ARGB4444_TW:
+	case PTI_ARGB4444_TW_VQ:
+		b = 2;
+		break;
+
 	case PTI_R16:
 	case PTI_R16F:
 		b = 1*2;
@@ -6460,6 +6470,14 @@ const char *Image_FormatName(uploadfmt_t fmt)
 	case PTI_ASTC_6X6X6_SRGB:	return "ASTC_6X6X6_SRGB";
 	case PTI_ASTC_6X6X6_LDR:	return "ASTC_6X6X6_LDR";
 #endif
+
+	//dreamcast pvr specific formats
+	case PTI_ARGB1555_TW: return "ARGB1555_TW";
+	case PTI_ARGB1555_TW_VQ: return "ARGB1555_TW_VQ";
+	case PTI_RGB565_TW: return "RGB565_TW";
+	case PTI_RGB565_TW_VQ: return "RGB565_TW_VQ";
+	case PTI_ARGB4444_TW: return "ARGB4444_TW";
+	case PTI_ARGB4444_TW_VQ: return "ARGB4444_TW_VQ";
 
 #ifdef FTE_TARGET_WEB
 	case PTI_WHOLEFILE:			return "Whole File";
@@ -7806,14 +7824,12 @@ static qboolean Image_GenMip0(struct pendingtextureinfo *mips, unsigned int flag
 #endif
 
 		//dreamcast pvr specific formats
-		case PTI_ARGB1555_TWIDDLED:
-		case PTI_ARGB1555_TWIDDLED_VQ:
-		case PTI_RGB565_TWIDDLED:
-		case PTI_RGB565_TWIDDLED_VQ:
-		case PTI_ARGB4444_TWIDDLED:
-		case PTI_ARGB4444_TWIDDLED_VQ:
-		case PTI_P4_TWIDDLED:
-		case PTI_P8_TWIDDLED:
+		case PTI_ARGB1555_TW:
+		case PTI_ARGB1555_TW_VQ:
+		case PTI_RGB565_TW:
+		case PTI_RGB565_TW_VQ:
+		case PTI_ARGB4444_TW:
+		case PTI_ARGB4444_TW_VQ:
 
 #ifdef FTE_TARGET_WEB
 		case PTI_WHOLEFILE:

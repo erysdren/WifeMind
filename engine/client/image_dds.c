@@ -792,14 +792,12 @@ qboolean Image_WriteDDSFile(const char *filename, enum fs_relative fsroot, struc
 	case PTI_P8:				return false;	//unsupported, technically R8_UNORM but would load back in wrongly.
 
 	//dreamcast pvr specific formats
-	case PTI_ARGB1555_TWIDDLED:
-	case PTI_ARGB1555_TWIDDLED_VQ:
-	case PTI_RGB565_TWIDDLED:
-	case PTI_RGB565_TWIDDLED_VQ:
-	case PTI_ARGB4444_TWIDDLED:
-	case PTI_ARGB4444_TWIDDLED_VQ:
-	case PTI_P4_TWIDDLED:
-	case PTI_P8_TWIDDLED:
+	case PTI_ARGB1555_TW:
+	case PTI_ARGB1555_TW_VQ:
+	case PTI_RGB565_TW:
+	case PTI_RGB565_TW_VQ:
+	case PTI_ARGB4444_TW:
+	case PTI_ARGB4444_TW_VQ:
 
 #ifdef FTE_TARGET_WEB
 	case PTI_WHOLEFILE:

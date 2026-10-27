@@ -287,14 +287,12 @@ typedef enum uploadfmt
 #endif
 
 	//dreamcast pvr specific formats
-	PTI_ARGB1555_TWIDDLED, //16bit alpha format, twiddled
-	PTI_ARGB1555_TWIDDLED_VQ, //16bit alpha format, vq compressed, twiddled
-	PTI_RGB565_TWIDDLED, //16bit format, twiddled
-	PTI_RGB565_TWIDDLED_VQ, //16bit format, vq compressed, twiddled
-	PTI_ARGB4444_TWIDDLED, //16bit alpha format, twiddled
-	PTI_ARGB4444_TWIDDLED_VQ, //16bit alpha format, vq compressed, twiddled
-	PTI_P4_TWIDDLED, //4-bit paletted, twiddled
-	PTI_P8_TWIDDLED, //8-bit paletted, twiddled
+	PTI_ARGB1555_TW, //16bit alpha format, twiddled
+	PTI_ARGB1555_TW_VQ, //16bit alpha format, vq compressed, twiddled
+	PTI_RGB565_TW, //16bit format, twiddled
+	PTI_RGB565_TW_VQ, //16bit format, vq compressed, twiddled
+	PTI_ARGB4444_TW, //16bit alpha format, twiddled
+	PTI_ARGB4444_TW_VQ, //16bit alpha format, vq compressed, twiddled
 
 	PTI_MAX,
 
