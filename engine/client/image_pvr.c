@@ -352,6 +352,11 @@ qbyte *ReadPVRFile(qbyte *buf, int len, int *width, int *height, uploadfmt_t *fo
 			ret = pvr_decode_mm(pvr, pvr_decode, pixel_func, false, false);
 			break;
 		}
+		case PVR_IMAGE_TYPE_RECTANGULAR_TW:
+		{
+			ret = pvr_decode(pvr, 0, true, pixel_func);
+			break;
+		}
 		default:
 		{
 			return NULL;
