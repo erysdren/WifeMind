@@ -2620,6 +2620,17 @@ static void Shader_ProgBlendFunc (parsestate_t *ps, const char **ptr)
 	}
 }
 
+static void Shaderpass_AlphaFunc (parsestate_t *ps, const char **ptr);
+static void Shader_ProgAlphaFunc (parsestate_t *ps, const char **ptr)
+{
+	if (ps->s->prog)
+	{
+		ps->pass = ps->s->passes;
+		Shaderpass_AlphaFunc(ps, ptr);
+		ps->pass = NULL;
+	}
+}
+
 static void Shader_ReflectCube(parsestate_t *ps, const char **ptr)
 {
 	char *token = Shader_ParseSensString(ptr);
@@ -3020,6 +3031,7 @@ static shaderkey_t shaderkeys[] =
 	{"hlsl11program",		Shader_HLSL11ProgramName,	"fte"},	//for d3d with embedded hlsl
 	{"progblendfunc",		Shader_ProgBlendFunc,		"fte"},	//specifies the blend mode (actually just overrides the first subpasses' blendmode.
 //	{"progmap",				Shader_ProgMap,				"fte"},	//avoids needing extra subpasses (actually just inserts an extra pass).
+	{"progalphafunc",		Shader_ProgAlphaFunc,		"fte"},	//specifies the alpha mode (actually just overrides the first subpasses' alphamode.
 
 	//dp compat
 	{"reflectcube",			Shader_ReflectCube,			"dp"},
