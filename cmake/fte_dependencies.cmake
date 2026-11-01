@@ -106,7 +106,7 @@ if(FTE_PLUGIN_BOX3D)
 	endif()
 endif()
 
-if(FTE_PLUGIN_BULLET)
+if(FTE_PLUGIN_BULLET OR FTE_ENGINE_USE_INTERNAL_BULLET)
 	if(FTE_VENDOR_DEPENDENCIES)
 		FetchContent_Declare(Bullet
 			URL "https://github.com/bulletphysics/bullet3/archive/refs/tags/2.89.tar.gz"
@@ -124,7 +124,7 @@ if(FTE_PLUGIN_BULLET)
 	endif()
 endif()
 
-if(FTE_PLUGIN_JOLT)
+if(FTE_PLUGIN_JOLT OR FTE_ENGINE_USE_INTERNAL_JOLT)
 	FetchContent_Declare(JoltPhysics
 		GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics.git"
 		GIT_TAG "v5.5.0"
@@ -136,7 +136,7 @@ if(FTE_PLUGIN_JOLT)
 	FetchContent_MakeAvailable(JoltPhysics)
 endif()
 
-if(FTE_PLUGIN_ODE OR FTE_ENGINE_USE_STATIC_ODE)
+if(FTE_PLUGIN_ODE OR FTE_ENGINE_USE_INTERNAL_ODE)
 	FetchContent_Declare(ODE
 		GIT_REPOSITORY "https://bitbucket.org/odedevs/ode.git"
 		GIT_TAG "0.16.6"
