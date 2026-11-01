@@ -363,6 +363,8 @@ if(FTE_ENGINE_CLIENT)
 			$<$<BOOL:${EMSCRIPTEN}>:OMIT_QCC>
 			$<$<BOOL:${EMSCRIPTEN}>:GL_STATIC>
 			$<$<BOOL:${FTE_ENGINE_USE_DXVK}>:AVAIL_DXVK>
+			$<$<BOOL:${FTE_ENGINE_USE_STATIC_ODE}>:ODE_STATIC>
+			$<$<BOOL:${FTE_ENGINE_USE_STATIC_ODE}>:USE_INTERNAL_ODE>
 	)
 	target_include_directories(fteqw
 		PRIVATE
@@ -394,6 +396,7 @@ if(FTE_ENGINE_CLIENT)
 			$<$<BOOL:${WIN32}>:winmm>
 			$<$<BOOL:${WIN32}>:ole32>
 			$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:dxguid>
+			$<$<BOOL:${FTE_ENGINE_USE_STATIC_ODE}>:ODE>
 	)
 	target_link_options(fteqw
 		PRIVATE

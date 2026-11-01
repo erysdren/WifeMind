@@ -136,7 +136,7 @@ if(FTE_PLUGIN_JOLT)
 	FetchContent_MakeAvailable(JoltPhysics)
 endif()
 
-if(FTE_PLUGIN_ODE)
+if(FTE_PLUGIN_ODE OR FTE_ENGINE_USE_STATIC_ODE)
 	FetchContent_Declare(ODE
 		GIT_REPOSITORY "https://bitbucket.org/odedevs/ode.git"
 		GIT_TAG "0.16.6"
