@@ -760,7 +760,7 @@ static qboolean ImgTool_ConvertPixelFormat(struct opts_s *args, const char *inna
 		Q_strncatz(command, " -srgb", sizeof(command));
 	if (targfmt >= PTI_ASTC_4X4_HDR && targfmt <= PTI_ASTC_12X12_HDR)
 		Q_strncatz(command, " -hdr", sizeof(command));
-	if (targfmt >= PTI_BC1_RGB && targfmt <= PTI_BC7_RGBA_SRGB && (strstr(inname, "_n.")||strstr(inname, "_norm.")))
+	if (targfmt >= PTI_BC1_RGB && targfmt <= PTI_BC7_RGBA_SRGB && (args->flags&IF_TRYBUMP)) // (strstr(inname, "_n.")||strstr(inname, "_norm."))
 		Q_strncatz(command, " -normal", sizeof(command));	//looks like a normalmap... tweak metrics to favour normalised results.
 
 #ifdef _WIN32
@@ -2933,6 +2933,10 @@ showhelp:
 				args.flags |= IF_NOMIPMAP;
 			else if (!strcmp(argv[u], "--mips"))
 				args.flags &= ~IF_NOMIPMAP;
+			else if (!strcmp(argv[u], "--normal"))
+				args.flags |= IF_TRYBUMP;
+			else if (!strcmp(argv[u], "--nonormal"))
+				args.flags &= ~IF_TRYBUMP;
 			else if (!strcmp(argv[u], "--premul"))
 				args.flags |= IF_PREMULTIPLYALPHA;
 			else if (!strcmp(argv[u], "--nopremul"))
