@@ -2929,11 +2929,11 @@ showhelp:
 				args.textype = PTI_2D_ARRAY;
 			else if (!strcmp(argv[u], "--cubearray"))
 				args.textype = PTI_CUBE_ARRAY;
-			else if (!strcmp(argv[u], "--nomips")	)
+			else if (!strcmp(argv[u], "--nomips"))
 				args.flags |= IF_NOMIPMAP;
 			else if (!strcmp(argv[u], "--mips"))
 				args.flags &= ~IF_NOMIPMAP;
-			else if (!strcmp(argv[u], "--premul")	)
+			else if (!strcmp(argv[u], "--premul"))
 				args.flags |= IF_PREMULTIPLYALPHA;
 			else if (!strcmp(argv[u], "--nopremul"))
 				args.flags &= ~IF_PREMULTIPLYALPHA;
