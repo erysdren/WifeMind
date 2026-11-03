@@ -1,6 +1,3 @@
-if(NOT FTE_TOOLS)
-	return()
-endif()
 
 function(fte_add_tool name)
 	cmake_parse_arguments(PARSE_ARGV 1 ARG "WIN32" "" "SOURCES")

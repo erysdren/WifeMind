@@ -1,6 +1,3 @@
-if(NOT FTE_PLUGINS)
-	return()
-endif()
 
 function(fte_add_plugin name)
 	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "TITLE;DESCRIPTION;GAMEDIR;CATEGORY" "SOURCES;INCLUDE_DIRECTORIES;DEPENDENCIES;COMPILE_DEFINITIONS")

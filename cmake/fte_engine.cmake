@@ -1,6 +1,3 @@
-if(NOT FTE_ENGINE)
-	return()
-endif()
 
 # regenerate vulkan shader blobs
 
