@@ -13,13 +13,20 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 	swvert_t *vt;
 	int y;
 	int secondhalf;
+
+	//l=value on left
+	//ld=change per y (on left)
+	//d=change per x
 	int xl,xld, xr,xrd;
 #ifdef SPAN_ST
-	float sl,sld, sd;
-	float tl,tld, td;
+	int sl,sld, sd;
+	int tl,tld, td;
+#endif
+#ifdef SPAN_ZI
+	int zil, zild, zid;
 #endif
 #ifdef SPAN_Z
-	unsigned int zl,zld, zd;
+	int zl,zld, zd;
 #endif
 	unsigned int *restrict outbuf;
 	unsigned int *restrict ti;
@@ -42,19 +49,19 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 	*/
 
 	/*reorder the verticies for height*/
-	if (v1->vcoord[1] > v2->vcoord[1])
+	if (v1->scoord[1] > v2->scoord[1])
 	{
 		vt = v1;
 		v1 = v2;
 		v2 = vt;
 	}
-	if (v1->vcoord[1] > v3->vcoord[1])
+	if (v1->scoord[1] > v3->scoord[1])
 	{
 		vt = v1;
 		v1 = v3;
 		v3 = vt;
 	}
-	if (v2->vcoord[1] > v3->vcoord[1])
+	if (v2->scoord[1] > v3->scoord[1])
 	{
 		vt = v3;
 		v3 = v2;
@@ -71,26 +78,26 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 		//reject triangles with any point offscreen, for now
 		for (i = 0; i < 3; i++)
 		{
-			if (v[i]->vcoord[0] < 0 || v[i]->vcoord[0] >= th->vpwidth)
+			if (v[i]->scoord[0] < 0 || v[i]->scoord[0] > th->vpwidth)
 				return;
-			if (v[i]->vcoord[1] < 0 || v[i]->vcoord[1] >= th->vpheight)
+			if (v[i]->scoord[1] < 0 || v[i]->scoord[1] > th->vpheight)
 				return;
-			if (v[i]->vcoord[2] < 0)
+			if (v[i]->zicoord < 0)
 				return;
 		}
 
 		for (i = 0; i < 2; i++)
 		{
-			if (v[i]->vcoord[1] > v[i+1]->vcoord[1])
+			if (v[i]->scoord[1] > v[i+1]->scoord[1])
 				return;
 		}
 	}
 
-	fdx1 = v2->vcoord[0] - v1->vcoord[0];
-	fdy1 = v2->vcoord[1] - v1->vcoord[1];
+	fdx1 = v2->scoord[0] - v1->scoord[0];
+	fdy1 = v2->scoord[1] - v1->scoord[1];
 
-	fdx2 = v3->vcoord[0] - v1->vcoord[0];
-	fdy2 = v3->vcoord[1] - v1->vcoord[1];
+	fdx2 = v3->scoord[0] - v1->scoord[0];
+	fdy2 = v3->scoord[1] - v1->scoord[1];
 
 	fz = fdx1*fdy2 - fdx2*fdy1;
 
@@ -107,31 +114,38 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 	fdy2 *= fz;
 
 #ifdef SPAN_ST	//affine
-	d1 = v2->tccoord[0] - v1->tccoord[0];
-	d2 = v3->tccoord[0] - v1->tccoord[0];
+	d1 = (v2->tccoord[0] - v1->tccoord[0])*(img->pwidth<<16);
+	d2 = (v3->tccoord[0] - v1->tccoord[0])*(img->pwidth<<16);
 	sld = fdx1*d2 - fdx2*d1;
 	sd = fdy2*d1 - fdy1*d2;
 
-	d1 = v2->tccoord[1] - v1->tccoord[1];
-	d2 = v3->tccoord[1] - v1->tccoord[1];
+	d1 = (v2->tccoord[1] - v1->tccoord[1])*(img->pheight<<16);
+	d2 = (v3->tccoord[1] - v1->tccoord[1])*(img->pheight<<16);
 	tld = fdx1*d2 - fdx2*d1;
 	td = fdy2*d1 - fdy1*d2;
 #endif
+#ifdef SPAN_ZI
+	d1 = (1<<16);
+	d2 = (1<<16);
+	zild = 0;//fdx1*d2 - fdx2*d1;
+	zid = 0;//fdy2*d1 - fdy1*d2;
+#endif
 #ifdef SPAN_Z
-	d1 = (v2->vcoord[2] - v1->vcoord[2])*UINT_MAX;
-	d2 = (v3->vcoord[2] - v1->vcoord[2])*UINT_MAX;
+	d1 = (v2->zicoord - v1->zicoord)*(1<<16);
+	d2 = (v3->zicoord - v1->zicoord)*(1<<16);
 	zld = fdx1*d2 - fdx2*d1;
 	zd = fdy2*d1 - fdy1*d2;
 #endif
 
 	ti = img->data;
 
-	y = v1->vcoord[1];
+	y = v1->scoord[1];
 
 	for (secondhalf = 0; secondhalf <= 1; secondhalf++)
 	{
 		if (secondhalf)
 		{
+		//	return;
 			if (numspans < 0)
 			{
 				interlace = -numspans;
@@ -145,6 +159,9 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 #ifdef SPAN_ST
 				sl += sld*interlace;
 				tl += tld*interlace;
+#endif
+#ifdef SPAN_ZI
+				zil += zild*interlace;
 #endif
 #ifdef SPAN_Z
 				zl += zld*interlace;
@@ -162,11 +179,14 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 				recalcside = 1;
 
 #ifdef SPAN_ST
-				sld -= sd*xld/(float)(1<<16);
-				tld -= td*xld/(float)(1<<16);
+				sld -= (((long long)sd*xld)>>16);
+				tld -= (((long long)td*xld)>>16);
+#endif
+#ifdef SPAN_ZI
+				zild -= (((long long)zid*xld)>>16);
 #endif
 #ifdef SPAN_Z
-				zld -= zd*xld/(float)(1<<16);
+				zld -= (((long long)zd*xld)>>16);
 #endif
 			}
 			else
@@ -180,7 +200,7 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 			}
 
 			//flip the triangle to keep it facing the screen (we swapped the verts almost randomly)
-			numspans = v3->vcoord[1] - y;
+			numspans = v3->scoord[1] - y;
 		}
 		else
 		{
@@ -200,46 +220,48 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 			recalcside = 3;
 
 			//flip the triangle to keep it facing the screen (we swapped the verts almost randomly)
-			numspans = v2->vcoord[1] - y;
+			numspans = v2->scoord[1] - y;
 		}
 
 		if (recalcside & 1)
 		{
-			dx = (vlb->vcoord[0] - vlt->vcoord[0]);
-			dy = (vlb->vcoord[1] - vlt->vcoord[1]);
+			dx = (vlb->scoord[0] - vlt->scoord[0]);
+			dy = (vlb->scoord[1] - vlt->scoord[1]);
 			if (dy > 0)
 				xld = (dx<<16) / dy;
 			else
 				xld = 0;
-			xl = (int)vlt->vcoord[0]<<16;
+			xl = (int)vlt->scoord[0]<<16;
 
 #ifdef SPAN_ST
-			sl = vlt->tccoord[0];
-			sld = sld + sd*xld/(float)(1<<16);
-			tl = vlt->tccoord[1];
-			tld = tld + td*xld/(float)(1<<16);
+			sl = vlt->tccoord[0] * (img->pwidth<<16);
+			sld = sld + (((long long)sd*xld+32767)>>16);
+			tl = vlt->tccoord[1] * (img->pheight<<16);
+			tld = tld + (((long long)td*xld+32767)>>16);
+#endif
+#ifdef SPAN_ZI
+			zil = (1<<16);///vlt->zicoord;
+			zild = zild + (((long long)zid*xld)>>16);
 #endif
 #ifdef SPAN_Z
-			zl = vlt->vcoord[2]*UINT_MAX;
-			zld = zld + zd*xld/(float)(1<<16);
+			zl = vlt->zicoord * (1<<16);
+			zld = zld + (((long long)zd*xld)>>16);
 #endif
 		}
 
 		if (recalcside & 2)
 		{
-			dx = (vrb->vcoord[0] - vrt->vcoord[0]);
-			dy = (vrb->vcoord[1] - vrt->vcoord[1]);
+			dx = (vrb->scoord[0] - vrt->scoord[0]);
+			dy = (vrb->scoord[1] - vrt->scoord[1]);
 			if (dy)
 				xrd = (dx<<16) / dy;
 			else
 				xrd = 0;
-			xr = (int)vrt->vcoord[0]<<16;
+			xr = (int)vrt->scoord[0]<<16;
 		}
 
-
-
-		if (y + numspans >= th->vpheight)
-			numspans = th->vpheight - y - 1;
+		if (y + numspans > th->vpheight)
+			numspans = th->vpheight - y;
 
 		if (numspans <= 0)
 			continue;
@@ -268,12 +290,15 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 			sl += sld*interlace;
 			tl += tld*interlace;
 #endif
+#ifdef SPAN_ZI
+			zil += zild*interlace;
+#endif
 #ifdef SPAN_Z
 			zl += zld*interlace;
 #endif
 		}
 
-		for (; numspans > 0; 
+		for (; numspans > 0;
 			numspans -= th->interlacemod
 			,xl += xld*th->interlacemod
 			,xr += xrd*th->interlacemod
@@ -284,14 +309,22 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 			,sl += sld*th->interlacemod
 			,tl += tld*th->interlacemod
 #endif
+#ifdef SPAN_ZI
+			,zil += zild*th->interlacemod
+#endif
 #ifdef SPAN_Z
 			,zl += zld*th->interlacemod
 #endif
 			)
 		{
 #ifdef SPAN_ST
-			float s = sl;
-			float t = tl;
+			unsigned int s = sl;
+			unsigned int t = tl;
+#endif
+#ifdef SPAN_ZI
+			unsigned int zi = zil;
+#else
+			const unsigned int zi = (1<<16);
 #endif
 #ifdef SPAN_Z
 			unsigned int z = zl;
@@ -301,7 +334,7 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 			spanlen = (xr - xl)>>16;
 			outbuf = vplout + (xl>>16);
 
-			while(spanlen-->=0)
+			while(spanlen-->0)
 			{
 				PLOT_PIXEL(*outbuf);
 				outbuf++;
@@ -309,6 +342,9 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 #ifdef SPAN_ST
 				s += sd;
 				t += td;
+#endif
+#ifdef SPAN_ZI
+				zi += zid;
 #endif
 #ifdef SPAN_Z
 				z += zd;
@@ -319,5 +355,7 @@ SPAN_ST - interpolates S+T across the span. access with 'sc' and 'tc'
 	}
 }
 
+#undef SPAN_Z
+#undef SPAN_ZI
 #undef SPAN_ST
 #undef PLOT_PIXEL
