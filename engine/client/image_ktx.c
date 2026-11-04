@@ -11,8 +11,8 @@ typedef struct
 	unsigned int gltypesize;
 	unsigned int glformat;
 	unsigned int glinternalformat;
-
 	unsigned int glbaseinternalformat;
+
 	unsigned int pixelwidth;
 	unsigned int pixelheight;
 	unsigned int pixeldepth;
@@ -246,10 +246,10 @@ qboolean Image_WriteKTXFile(const char *filename, enum fs_relative fsroot, struc
 
 	for (mipnum = 0; mipnum < mips->mipcount; )
 	{
-		unsigned int sz;
+		uint32_t sz;
+		unsigned int padbytes;
 		//translate to blocks
 		unsigned int browbytes = bb * ((mips->mip[mipnum].width+bw-1)/bh);
-		unsigned int padbytes = (browbytes&3)?4-(browbytes&3):0;
 		unsigned int brows = (mips->mip[mipnum].height+bh-1)/bh;
 		unsigned int blayers = (mips->mip[mipnum].depth+bd-1)/bd;
 		if (mips->mip[mipnum].datasize != browbytes*brows*blayers)
@@ -264,28 +264,23 @@ qboolean Image_WriteKTXFile(const char *filename, enum fs_relative fsroot, struc
 			VFS_CLOSE(file);
 			return false;
 		case PTI_CUBE:	//special case, size is per-face
-			sz = (browbytes+padbytes) * brows;
+			sz = browbytes * brows;
 			break;
 		case PTI_2D:
 		case PTI_2D_ARRAY:
 		case PTI_CUBE_ARRAY:
 		case PTI_3D:
-			sz = (browbytes+padbytes) * brows * blayers;
+			sz = mips->mip[mipnum].datasize;
 			break;
 		}
-		VFS_WRITE(file, &sz, 4);
-		brows *= blayers;
+		VFS_WRITE(file, &sz, sizeof(uint32_t));
+		VFS_WRITE(file, mips->mip[mipnum].data, mips->mip[mipnum].datasize);
+		padbytes = VFS_TELL(file) % sizeof(uint32_t);
 		if (padbytes)
 		{
-			unsigned int pad = 0, y;
-			for (y = 0; y < brows; y++)
-			{
-				VFS_WRITE(file, (qbyte*)mips->mip[mipnum].data + browbytes*y, browbytes);
-				VFS_WRITE(file, &pad, 4-(browbytes&3));
-			}
+			uint32_t pad = 0;
+			VFS_WRITE(file, &pad, padbytes);
 		}
-		else
-			VFS_WRITE(file, mips->mip[mipnum].data, browbytes*brows);
 		mipnum++;
 	}
 
@@ -489,29 +484,27 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 	mips = Z_Malloc(sizeof(*mips));
 	mips->mipcount = 0;
 	if (header.pixeldepth)
+	{
 		mips->type = PTI_3D;
-	else if (header.numberoffaces==6)
+	}
+	else if (header.numberoffaces == 6)
 	{
 		if (header.numberofarrayelements)
 		{
-			header.pixeldepth = header.numberofarrayelements*6;
 			mips->type = PTI_CUBE_ARRAY;
 		}
 		else
+		{
 			mips->type = PTI_CUBE;
+		}
+	}
+	else if (header.numberofarrayelements)
+	{
+		mips->type = PTI_2D_ARRAY;
 	}
 	else
 	{
-		if (header.numberofarrayelements)
-		{
-			header.pixeldepth = header.numberofarrayelements;
-			mips->type = PTI_2D_ARRAY;
-		}
-		else
-		{
-			header.pixeldepth = 1;
-			mips->type = PTI_2D;
-		}
+		mips->type = PTI_2D;
 	}
 	mips->extrafree = filedata;
 	mips->encoding = encoding;
@@ -539,16 +532,15 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 			datasize = LongSwap(datasize);
 
 		browbytes = blockbytes * ((w+blockwidth-1)/blockwidth);
-		padbytes = (browbytes & 3)?4-(browbytes&3):0;
 		rows = ((h+blockheight-1)/blockheight)*
 			   ((d+blockdepth-1)/blockdepth);
-		if (datasize != (browbytes+padbytes) * rows)
+		if (datasize != browbytes * rows * f * l)
 		{
-			Con_Printf("%s: mip %i does not match expected size (%u, required %u)\n", fname, mipnum, datasize, (browbytes+padbytes) * rows);
+			Con_Printf("%s: mip %i does not match expected size (%u, required %u)\n", fname, mipnum, datasize, browbytes * rows);
 			break;
 		}
 
-		if (filedata + datasize*f*l > fileend)
+		if (filedata + datasize > fileend)
 		{
 			Con_Printf("%s: truncation at mip %i\n", fname, mipnum);
 			break;
@@ -559,8 +551,9 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 		mips->mip[mips->mipcount].width = w;
 		mips->mip[mips->mipcount].height = h;
 		mips->mip[mips->mipcount].depth = d*l*f;
+		// Con_Printf("mips->mip[mips->mipcount].depth: %d*%d*%d=%d\n", d, l, f, mips->mip[mips->mipcount].depth);
 
-		if (padbytes || header.endianness == 0x01020304)
+		if (header.endianness == 0x01020304)
 		{	//gah.
 			//the ktx format is 4-byte aligned. our internal representation is tightly packed (consistent with everything but gl).
 			//in the case of byteswapping, any data types should work out okay (no misaligned stuff).
@@ -572,28 +565,30 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 			{
 				for (y = 0; y < rows; y++)
 					for (x = 0; x < browbytes>>2; x++)
-						((int*)((qbyte*)mips->mip[mips->mipcount].data + y*browbytes))[x] = LongSwap(((int*)filedata + y*browbytes+padbytes)[x]);
+						((int*)((qbyte*)mips->mip[mips->mipcount].data + y*browbytes))[x] = LongSwap(((int*)filedata + y*browbytes)[x]);
 			}
 			else if (header.gltypesize == 2 && header.endianness == 0x01020304)
 			{
 				for (y = 0; y < rows; y++)
 					for (x = 0; x < browbytes>>1; x++)
-						((short*)((qbyte*)mips->mip[mips->mipcount].data + y*browbytes))[x] = ShortSwap(((short*)filedata + y*browbytes+padbytes)[x]);
+						((short*)((qbyte*)mips->mip[mips->mipcount].data + y*browbytes))[x] = ShortSwap(((short*)filedata + y*browbytes)[x]);
 			}
 			else
 			{	//erk, panic...
 				for (y = 0; y < rows; y++)
-					memcpy((qbyte*)mips->mip[mips->mipcount].data + y*browbytes, filedata + y*browbytes+padbytes, browbytes);
+					memcpy((qbyte*)mips->mip[mips->mipcount].data + y*browbytes, filedata + y*browbytes, browbytes);
 			}
 		}
 		else
 		{
-			mips->mip[mips->mipcount].datasize = datasize * l*f;
+			mips->mip[mips->mipcount].datasize = datasize;
 			mips->mip[mips->mipcount].data = filedata;
 		}
 		mips->mipcount++;
 
-		filedata += datasize *l*f;
+		filedata += datasize;
+		while ((size_t)filedata % 4)
+			filedata++;
 
 		w = max(1, w>>1);
 		h = max(1, h>>1);
@@ -603,6 +598,7 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 
 	if (!mips->mipcount)
 	{
+		Con_Printf("%s: failed to get any mips\n", fname);
 		Z_Free(mips);
 		return NULL;
 	}
