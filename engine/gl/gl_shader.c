@@ -3091,6 +3091,7 @@ static shaderkey_t shaderkeys[] =
 	{NULL,				NULL}
 };
 
+#if 0
 static struct
 {
 	char *name;
@@ -3103,6 +3104,42 @@ static struct
 //	{"specularmap", 	"{\nblend specularmap\nmap %1\n}"},
 	{NULL}
 };
+#endif
+static struct shadermacro_s
+{
+	char *name;
+	char *body;
+} *shadermacros = NULL;
+static int num_shadermacros = 0;
+
+static void ShaderMacro_Shutdown(void)
+{
+	if (shadermacros != NULL) {
+		int i;
+		for (i = 0; i < num_shadermacros; i++) {
+			Z_Free(shadermacros[i].name);
+			Z_Free(shadermacros[i].body);
+		}
+		BZ_Free(shadermacros);
+		shadermacros = NULL;
+		num_shadermacros = 0;
+	}
+}
+
+static void ShaderMacro_Init(void)
+{
+	// clear old macros
+	ShaderMacro_Shutdown();
+}
+
+static struct shadermacro_s *ShaderMacro_Add(const char *name, const char *bodystart, const char *bodyend)
+{
+	shadermacros = BZ_Realloc(shadermacros, sizeof(struct shadermacro_s) * (num_shadermacros + 1));
+	shadermacros[num_shadermacros].name = Z_StrDup(name);
+	shadermacros[num_shadermacros].body = memcpy(Z_Malloc(bodyend - bodystart + 1), bodystart, bodyend - bodystart);
+	// Con_Printf("%s: %s\n", shadermacros[num_shadermacros].name, shadermacros[num_shadermacros].body);
+	return &shadermacros[num_shadermacros++];
+}
 
 // ===============================================================
 
@@ -4375,7 +4412,12 @@ int QDECL Shader_InitCallback_Doom3 (const char *name, qofs_t size, time_t mtime
 
 qboolean Shader_Init (void)
 {
+	const char decal_macro[] = "polygonOffset 1\ndiscrete\nsort decal\nnoShadows";
 	int wibuf[16];
+
+	// init macros
+	ShaderMacro_Init();
+	ShaderMacro_Add("decal_macro", decal_macro, decal_macro + sizeof(decal_macro));
 
 	if (!r_shaders)
 	{
@@ -4563,6 +4605,25 @@ static void Shader_MakeCache(const char *path, unsigned int parseflags)
 		if ( !token[0] || ptr - buf >= size )
 			break;
 
+		if ( Q_stricmp(token, "macro") == 0 ) {
+			char name[256];
+			const char *start, *end, *temp;
+			token = COM_ParseExt(&ptr, true, true);
+			if ( !token[0] || ptr - buf >= size ) {
+				Con_Printf("macro in '%s' doesn't have a name\n", path);
+				break;
+			}
+			COM_CleanUpPath(token);
+			Q_strncpyz(name, token, sizeof(name));
+			temp = ptr;
+			COM_ParseExt(&ptr, true, true);
+			start = ptr;
+			ptr = Shader_Skip(path, name, temp);
+			end = ptr - 1;
+			ShaderMacro_Add(name, start, end);
+			continue;
+		}
+
 		COM_CleanUpPath(token);
 
 		if (Shader_LocateSource(token, NULL, NULL, NULL, NULL))
@@ -4721,6 +4782,9 @@ void Shader_Shutdown (void)
 		Z_Free(r_shaders[i]);
 		r_shaders[i] = NULL;
 	}
+
+	// clear macros
+	ShaderMacro_Shutdown();
 
 	Shader_FlushCache();
 	Shader_FlushGenerics();
@@ -7533,7 +7597,7 @@ static qboolean Shader_ReadShaderTerms(parsestate_t *ps, struct scondinfo_s *con
 	else if (!Shader_Conditional_Read(ps, cond, token, &ps->ptr))
 	{
 		int i;
-		for (i = 0; shadermacros[i].name; i++)
+		for (i = 0; i < num_shadermacros; i++)
 		{
 			if (!Q_stricmp (token, shadermacros[i].name))
 			{
@@ -7565,13 +7629,13 @@ static qboolean Shader_ReadShaderTerms(parsestate_t *ps, struct scondinfo_s *con
 					else if (*in == '%')
 					{	//expand an arg
 						char *e;
-						int i = strtol(in+1, &e, 0);
+						int j = strtol(in+1, &e, 0);
 						if (e != in+1)
 						{
-							i--;
-							if (i >= 0 && i < countof(arg))
+							j--;
+							if (j >= 0 && j < countof(arg))
 							{
-								for (in = arg[i]; *in; )
+								for (in = arg[j]; *in; )
 								{
 									if (out == tmp+countof(tmp)-1)
 										break;
@@ -7588,7 +7652,11 @@ static qboolean Shader_ReadShaderTerms(parsestate_t *ps, struct scondinfo_s *con
 
 				oldptr = ps->ptr;
 				ps->ptr = tmp;
-				Shader_ReadShaderTerms(ps, cond);
+				while (Shader_ReadShaderTerms(ps, cond))
+				{
+				}
+				if (cond->depth)
+					Con_Printf("if statements without endif in shader macro %s\n", shadermacros[i].name);
 				ps->ptr = oldptr;
 				return true;
 			}
