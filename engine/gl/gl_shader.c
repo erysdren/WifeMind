@@ -7601,7 +7601,7 @@ static qboolean Shader_ReadShaderTerms(parsestate_t *ps, struct scondinfo_s *con
 		{
 			if (!Q_stricmp (token, shadermacros[i].name))
 			{
-#define SHADER_MACRO_ARGS 8
+#define SHADER_MACRO_ARGS 10
 				int argn = 0;
 				const char *oldptr;
 				char arg[SHADER_MACRO_ARGS][256];
@@ -7614,7 +7614,7 @@ static qboolean Shader_ReadShaderTerms(parsestate_t *ps, struct scondinfo_s *con
 					{
 						break;
 					}
-					if (argn <= SHADER_MACRO_ARGS)
+					if (argn < SHADER_MACRO_ARGS)
 					{
 						Q_strncpyz(arg[argn], token, sizeof(arg[argn]));
 						argn++;
@@ -7632,8 +7632,7 @@ static qboolean Shader_ReadShaderTerms(parsestate_t *ps, struct scondinfo_s *con
 						int j = strtol(in+1, &e, 0);
 						if (e != in+1)
 						{
-							j--;
-							if (j >= 0 && j < countof(arg))
+							if (j >= 0 && j < SHADER_MACRO_ARGS)
 							{
 								for (in = arg[j]; *in; )
 								{
