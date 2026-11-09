@@ -562,7 +562,7 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 		mips->mip[mips->mipcount].width = w;
 		mips->mip[mips->mipcount].height = h;
 		mips->mip[mips->mipcount].depth = d*l*f;
-		// Con_Printf("mips->mip[mips->mipcount].depth: %d*%d*%d=%d\n", d, l, f, mips->mip[mips->mipcount].depth);
+		// Con_Printf("%s: mips->mip[%d].depth: %d*%d*%d=%d\n", fname, mips->mipcount, d, l, f, mips->mip[mips->mipcount].depth);
 
 		if (header.endianness == 0x01020304)
 		{	//gah.
@@ -592,12 +592,26 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 		}
 		else
 		{
-			mips->mip[mips->mipcount].datasize = datasize;
+			if (mips->type == PTI_CUBE)
+			{
+				mips->mip[mips->mipcount].datasize = datasize * f * l;
+			}
+			else
+			{
+				mips->mip[mips->mipcount].datasize = datasize;
+			}
 			mips->mip[mips->mipcount].data = filedata;
 		}
 		mips->mipcount++;
 
-		filedata += datasize;
+		if (mips->type == PTI_CUBE)
+		{
+			filedata += datasize * f * l;
+		}
+		else
+		{
+			filedata += datasize;
+		}
 		while ((size_t)filedata % 4)
 			filedata++;
 
