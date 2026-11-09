@@ -534,10 +534,21 @@ static struct pendingtextureinfo *Image_ReadKTX1File(unsigned int flags, const c
 		browbytes = blockbytes * ((w+blockwidth-1)/blockwidth);
 		rows = ((h+blockheight-1)/blockheight)*
 			   ((d+blockdepth-1)/blockdepth);
-		if (datasize != browbytes * rows * f * l)
+		if (mips->type == PTI_CUBE)
 		{
-			Con_Printf("%s: mip %i does not match expected size (%u, required %u)\n", fname, mipnum, datasize, browbytes * rows);
-			break;
+			if (datasize != browbytes * rows)
+			{
+				Con_Printf("%s: mip %i does not match expected size (%u, required %u)\n", fname, mipnum, datasize, browbytes * rows);
+				break;
+			}
+		}
+		else
+		{
+			if (datasize != browbytes * rows * f * l)
+			{
+				Con_Printf("%s: mip %i does not match expected size (%u, required %u)\n", fname, mipnum, datasize, browbytes * rows * f * l);
+				break;
+			}
 		}
 
 		if (filedata + datasize > fileend)
