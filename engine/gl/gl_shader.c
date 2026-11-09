@@ -346,6 +346,8 @@ static qboolean Shader_EvaluateCondition(shader_t *shader, const char **ptr)
 	char *token;
 	cvar_t *cv;
 	float lhs;
+	char lhs_str[256];
+	qboolean stringcompare = false;
 	qboolean conditiontrue = true;
 	token = COM_ParseExt(ptr, false, false);
 	if (*token == '!')
@@ -446,8 +448,10 @@ static qboolean Shader_EvaluateCondition(shader_t *shader, const char **ptr)
 			}
 			else
 			{
-				Con_Printf("Shader_EvaluateCondition: '%s' is not a cvar\n", token);
+				// Con_Printf("Shader_EvaluateCondition: '%s' is not a cvar\n", token);
 				lhs = 0;
+				Q_strncpyz(lhs_str, token, sizeof(lhs_str));
+				stringcompare = true;
 			}
 		}
 	}
@@ -459,21 +463,34 @@ static qboolean Shader_EvaluateCondition(shader_t *shader, const char **ptr)
 		char cmp[4];
 		memcpy(cmp, token, 4);
 		token = COM_ParseExt(ptr, false, false);
-		rhs = atof(token);
-		if (!strcmp(cmp, "!="))
-			conditiontrue = lhs != rhs;
-		else if (!strcmp(cmp, "=="))
-			conditiontrue = lhs == rhs;
-		else if (!strcmp(cmp, "<"))
-			conditiontrue = lhs < rhs;
-		else if (!strcmp(cmp, "<="))
-			conditiontrue = lhs <= rhs;
-		else if (!strcmp(cmp, ">"))
-			conditiontrue = lhs > rhs;
-		else if (!strcmp(cmp, ">="))
-			conditiontrue = lhs >= rhs;
+		if (stringcompare)
+		{
+			Con_Printf("lhs: %s rhs: %s\n", lhs_str, token);
+			if (!strcmp(cmp, "!="))
+				conditiontrue = Q_strnicmp(lhs_str, token, sizeof(lhs_str)) != 0;
+			else if (!strcmp(cmp, "=="))
+				conditiontrue = Q_strnicmp(lhs_str, token, sizeof(lhs_str)) == 0;
+			else
+				conditiontrue = false;
+		}
 		else
-			conditiontrue = false;
+		{
+			rhs = atof(token);
+			if (!strcmp(cmp, "!="))
+				conditiontrue = lhs != rhs;
+			else if (!strcmp(cmp, "=="))
+				conditiontrue = lhs == rhs;
+			else if (!strcmp(cmp, "<"))
+				conditiontrue = lhs < rhs;
+			else if (!strcmp(cmp, "<="))
+				conditiontrue = lhs <= rhs;
+			else if (!strcmp(cmp, ">"))
+				conditiontrue = lhs > rhs;
+			else if (!strcmp(cmp, ">="))
+				conditiontrue = lhs >= rhs;
+			else
+				conditiontrue = false;
+		}
 	}
 	else
 	{
