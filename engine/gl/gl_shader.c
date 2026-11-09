@@ -440,7 +440,9 @@ static qboolean Shader_EvaluateCondition(shader_t *shader, const char **ptr)
 
 		else
 		{
-			cv = Cvar_Get(token, "", 0, "Shader Conditions");
+			// erysdren 2026-11-09: replaced Cvar_Get with Cvar_FindVar to allow string comparisons in conditionals
+			// cv = Cvar_Get(token, "", 0, "Shader Conditions");
+			cv = Cvar_FindVar(token);
 			if (cv)
 			{
 				cv->flags |= CVAR_SHADERSYSTEM;
@@ -465,7 +467,6 @@ static qboolean Shader_EvaluateCondition(shader_t *shader, const char **ptr)
 		token = COM_ParseExt(ptr, false, false);
 		if (stringcompare)
 		{
-			Con_Printf("lhs: %s rhs: %s\n", lhs_str, token);
 			if (!strcmp(cmp, "!="))
 				conditiontrue = Q_strnicmp(lhs_str, token, sizeof(lhs_str)) != 0;
 			else if (!strcmp(cmp, "=="))
