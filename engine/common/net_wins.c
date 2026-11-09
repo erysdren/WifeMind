@@ -45,6 +45,10 @@ extern ftemanifest_t	*fs_manifest;
 	#define USE_GETHOSTNAME_LOCALLISTING
 #endif
 
+#if defined(_WIN32) && !defined(MSG_NOSIGNAL)
+	#define MSG_NOSIGNAL 0
+#endif
+
 netadr_t	net_local_cl_ipadr;	//still used to match local ui requests (quake/gamespy), and to generate ip reports for q3 servers (which is probably pointless).
 
 struct ftenet_generic_connection_s *net_from_connection;
