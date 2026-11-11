@@ -31,69 +31,121 @@
 		},
 		{
 			"name": "emscripten",
+			"hidden": true,
 			"displayName": "Emscripten",
 			"binaryDir": "${sourceDir}/build-emscripten",
 			"toolchainFile": "$env{EMSCRIPTEN_ROOT}/cmake/Modules/Platform/Emscripten.cmake",
 			"cacheVariables": {
 				"FTE_ENGINE_USE_SDL": false,
-				"FTE_PLUGINS": false,
-				"FTE_TOOLS": false,
+				"FTE_PLUGINS_START_ENABLED": false,
+				"FTE_TOOLS_START_ENABLED": false,
 				"BUILD_SHARED_LIBS": false,
 				"FTE_VENDOR_DEPENDENCIES": false,
-				"FTE_ENGINE_SERVER": false,
+				"FTE_ENGINE_START_ENABLED": false,
 				"FTE_ENGINE_CLIENT": true
 			}
 		},
 		{
+			"name": "emscripten-debug",
+			"inherits": "emscripten",
+			"displayName": "Emscripten (debug)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+		},
+		{
+			"name": "emscripten-release",
+			"inherits": "emscripten",
+			"displayName": "Emscripten (release)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+		},
+		{
 			"name": "nxdk",
+			"hidden": true,
 			"displayName": "NXDK",
 			"binaryDir": "${sourceDir}/build-nxdk",
 			"toolchainFile": "$env{NXDK_DIR}/share/toolchain-nxdk.cmake",
 			"cacheVariables": {
 				"FTE_ENGINE_USE_SDL": false,
-				"FTE_PLUGINS": false,
-				"FTE_TOOLS": false,
+				"FTE_PLUGINS_START_ENABLED": false,
+				"FTE_TOOLS_START_ENABLED": false,
 				"BUILD_SHARED_LIBS": false,
 				"FTE_VENDOR_DEPENDENCIES": false,
-				"FTE_ENGINE_SERVER": false,
+				"FTE_ENGINE_START_ENABLED": false,
 				"FTE_ENGINE_CLIENT": true,
 				"FTE_ENGINE_RENDERER": "d3d8"
 			}
 		},
 		{
+			"name": "nxdk-debug",
+			"inherits": "nxdk",
+			"displayName": "NXDK (debug)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+		},
+		{
+			"name": "nxdk-release",
+			"inherits": "nxdk",
+			"displayName": "NXDK (release)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+		},
+		{
 			"name": "kos",
+			"hidden": true,
 			"displayName": "KallistiOS",
 			"binaryDir": "build-kos",
 			"toolchainFile": "$env{KOS_CMAKE_TOOLCHAIN}",
 			"cacheVariables": {
 				"FTE_ENGINE_USE_SDL": false,
-				"FTE_PLUGINS": false,
-				"FTE_TOOLS": false,
+				"FTE_PLUGINS_START_ENABLED": false,
+				"FTE_TOOLS_START_ENABLED": false,
 				"BUILD_SHARED_LIBS": false,
 				"SKIP_INSTALL_ALL": true,
 				"FTE_VENDOR_DEPENDENCIES": true,
-				"FTE_ENGINE_SERVER": false,
+				"FTE_ENGINE_START_ENABLED": false,
 				"FTE_ENGINE_CLIENT": true,
 				"FTE_ENGINE_RENDERER": "pvr"
 			}
 		},
 		{
+			"name": "kos-debug",
+			"inherits": "kos",
+			"displayName": "KallistiOS (debug)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+		},
+		{
+			"name": "kos-release",
+			"inherits": "kos",
+			"displayName": "KallistiOS (release)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+		},
+		{
 			"name": "psp",
+			"hidden": true,
 			"displayName": "PSP",
 			"binaryDir": "build-psp",
 			"toolchainFile": "$env{PSPDEV}/psp/share/pspdev.cmake",
 			"cacheVariables": {
 				"FTE_ENGINE_USE_SDL": true,
 				"FTE_ENGINE_SDL_VERSION_MAJOR": "3",
-				"FTE_PLUGINS": false,
-				"FTE_TOOLS": false,
+				"FTE_PLUGINS_START_ENABLED": false,
+				"FTE_TOOLS_START_ENABLED": false,
 				"BUILD_SHARED_LIBS": false,
 				"SKIP_INSTALL_ALL": true,
 				"FTE_VENDOR_DEPENDENCIES": true,
-				"FTE_ENGINE_SERVER": false,
+				"FTE_ENGINE_START_ENABLED": false,
 				"FTE_ENGINE_CLIENT": true,
 				"FTE_ENGINE_RENDERER": "gl"
 			}
+		},
+		{
+			"name": "psp-debug",
+			"inherits": "psp",
+			"displayName": "PSP (debug)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+		},
+		{
+			"name": "psp-release",
+			"inherits": "psp",
+			"displayName": "PSP (release)",
+			"cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
 		}
 	],
 	"buildPresets": [
@@ -103,13 +155,13 @@
 		{ "name": "linux-release", "configurePreset": "linux-release" },
 		{ "name": "macos-debug", "configurePreset": "macos", "configuration": "Debug" },
 		{ "name": "macos-release", "configurePreset": "macos", "configuration": "Release" },
-		{ "name": "emscripten-debug", "configurePreset": "emscripten", "configuration": "Debug" },
-		{ "name": "emscripten-release", "configurePreset": "emscripten", "configuration": "Release" },
-		{ "name": "nxdk-debug", "configurePreset": "nxdk", "configuration": "Debug" },
-		{ "name": "nxdk-release", "configurePreset": "nxdk", "configuration": "Release" },
-		{ "name": "kos-debug", "configurePreset": "kos", "configuration": "Debug" },
-		{ "name": "kos-release", "configurePreset": "kos", "configuration": "Release" },
-		{ "name": "psp-debug", "configurePreset": "psp", "configuration": "Debug" },
-		{ "name": "psp-release", "configurePreset": "psp", "configuration": "Release" }
+		{ "name": "emscripten-debug", "configurePreset": "emscripten-debug" },
+		{ "name": "emscripten-release", "configurePreset": "emscripten-release" },
+		{ "name": "nxdk-debug", "configurePreset": "nxdk-debug" },
+		{ "name": "nxdk-release", "configurePreset": "nxdk-release" },
+		{ "name": "kos-debug", "configurePreset": "kos-debug" },
+		{ "name": "kos-release", "configurePreset": "kos-release" },
+		{ "name": "psp-debug", "configurePreset": "psp-debug" },
+		{ "name": "psp-release", "configurePreset": "psp-release" }
 	]
 }
