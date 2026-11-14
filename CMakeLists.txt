@@ -99,6 +99,7 @@ set(FTE_ENGINE_SERVER_NAME "fteqw-sv" CACHE STRING "Name of server binary")
 set(FTE_COMMON_LINK_OPTIONS "")
 set(FTE_COMMON_OPTIONS "")
 set(FTE_COMMON_DEFINITIONS "")
+set(FTE_COMMON_INCLUDES "")
 
 list(APPEND FTE_COMMON_OPTIONS
 	$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release>>:-O3>
@@ -156,6 +157,10 @@ function(fte_add_common target)
 	target_compile_definitions(${target}
 		PRIVATE
 			${FTE_COMMON_DEFINITIONS}
+	)
+	target_include_directories(${target}
+		PRIVATE
+			${FTE_COMMON_INCLUDES}
 	)
 endfunction()
 
