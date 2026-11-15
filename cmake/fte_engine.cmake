@@ -2,38 +2,59 @@
 # regenerate vulkan shader blobs
 
 if(0)
-add_executable(fteqw-makevulkanblob
-	${FTE_ENGINE_SHADERS_DIR}/makevulkanblob.c
-)
+find_program(CPP_EXECUTABLE cpp)
+find_program(GLSL_EXECUTABLE glslangValidator)
 
-file(GLOB_RECURSE fte_vulkan_shader_files LIST_DIRECTORIES FALSE
-	"${FTE_ENGINE_SHADERS_DIR}/vulkan/*.glsl"
-	"${FTE_ENGINE_SHADERS_DIR}/vulkan/*.h"
-)
-
-add_custom_target(fteqw-regenerate-vulkan-blobs)
-
-foreach(shaderfile IN LISTS fte_vulkan_shader_files)
-	set(shaderblob ${shaderfile})
-	cmake_path(REPLACE_EXTENSION shaderblob ".fvb")
-	cmake_path(GET shaderblob ROOT_PATH shaderpath)
-	cmake_path(GET shaderblob STEM shaderstem)
-	set(rqshaderblob "${shaderpath}/rq_${shaderstem}.fvb")
-	add_custom_command(
-		OUTPUT ${shaderblob}
-		DEPENDS fteqw-makevulkanblob
-		COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-makevulkanblob>" ${shaderfile} ${shaderblob}
-		WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
+if(CPP_EXECUTABLE AND GLSL_EXECUTABLE)
+	add_executable(fteqw-makevulkanblob
+		${FTE_ENGINE_SHADERS_DIR}/makevulkanblob.c
 	)
-	add_custom_command(
-		OUTPUT ${rqshaderblob}
-		DEPENDS fteqw-makevulkanblob
-		COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-makevulkanblob>" ${shaderfile} ${rqshaderblob} rq
-		WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
+
+	file(GLOB_RECURSE fte_vulkan_shader_files LIST_DIRECTORIES FALSE
+		"${FTE_ENGINE_SHADERS_DIR}/vulkan/*.glsl"
+		"${FTE_ENGINE_SHADERS_DIR}/vulkan/*.h"
 	)
-	add_custom_target(fteqw-regenerate-vulkan-${shaderstem} DEPENDS ${shaderblob} ${rqshaderblob})
-	add_dependencies(fteqw-regenerate-vulkan-blobs fteqw-regenerate-vulkan-${shaderstem})
-endforeach()
+
+	add_custom_target(fteqw-regenerate-vulkan-blobs)
+
+	foreach(shaderfile IN LISTS fte_vulkan_shader_files)
+		set(shaderblob ${shaderfile})
+		cmake_path(REPLACE_EXTENSION shaderblob ".fvb")
+		cmake_path(GET shaderblob ROOT_PATH shaderpath)
+		cmake_path(GET shaderblob STEM shaderstem)
+		set(rqshaderblob "${shaderpath}/rq_${shaderstem}.fvb")
+		add_custom_command(
+			OUTPUT ${shaderblob}
+			DEPENDS fteqw-makevulkanblob
+			COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-makevulkanblob>" ${shaderfile} ${shaderblob}
+			WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
+		)
+		add_custom_command(
+			OUTPUT ${rqshaderblob}
+			DEPENDS fteqw-makevulkanblob
+			COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-makevulkanblob>" ${shaderfile} ${rqshaderblob} rq
+			WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
+		)
+		add_custom_target(fteqw-regenerate-vulkan-${shaderstem} DEPENDS ${shaderblob} ${rqshaderblob})
+		add_dependencies(fteqw-regenerate-vulkan-blobs fteqw-regenerate-vulkan-${shaderstem})
+	endforeach()
+elseif(FTE_ENGINE_RENDERER STREQUAL "vk")
+	if(NOT CPP_EXECUTABLE AND NOT GLSL_EXECUTABLE)
+		message(FATAL_ERROR "you have selected Vulkan as FTE's rendering backend, but the C preprocessor (cpp) and glslangValidator could not be found.")
+	elseif(NOT CPP_EXECUTABLE)
+		message(FATAL_ERROR "you have selected Vulkan as FTE's rendering backend, but the C preprocessor (cpp) could not be found.")
+	elseif(NOT GLSL_EXECUTABLE)
+		message(FATAL_ERROR "you have selected Vulkan as FTE's rendering backend, but glslangValidator could not be found.")
+	endif()
+else()
+	if(NOT CPP_EXECUTABLE AND NOT GLSL_EXECUTABLE)
+		message(WARNING "cannot embed Vulkan shader blobs, as the C preprocessor (cpp) and glslangValidator could not be found.")
+	elseif(NOT CPP_EXECUTABLE)
+		message(WARNING "cannot embed Vulkan shader blobs, as the C preprocessor (cpp) could not be found.")
+	elseif(NOT GLSL_EXECUTABLE)
+		message(WARNING "cannot embed Vulkan shader blobs, as glslangValidator could not be found.")
+	endif()
+endif()
 endif()
 
 # regenerate bishaders header
@@ -45,7 +66,7 @@ add_executable(fteqw-generatebuiltinsl
 
 add_custom_command(
 	OUTPUT ${FTE_ENGINE_GL_DIR}/r_bishaders.h
-	DEPENDS fteqw-generatebuiltinsl
+	DEPENDS fteqw-generatebuiltinsl $<TARGET_NAME_IF_EXISTS:fteqw-regenerate-vulkan-blobs>
 	COMMAND ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:fteqw-generatebuiltinsl>" ${FTE_ENGINE_GL_DIR}/r_bishaders.h
 	WORKING_DIRECTORY ${FTE_ENGINE_SHADERS_DIR}
 )
