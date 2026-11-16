@@ -128,6 +128,9 @@ set(ENGINE_ROUTING TRUE CACHE STRING "") #Engine-provided routing logic (possibl
 set(USE_INTERNAL_BULLET FALSE CACHE STRING "") #Statically link against bullet physics plugin (instead of using an external plugin)
 set(USE_INTERNAL_ODE FALSE CACHE STRING "") #Statically link against ode physics plugin (instead of using an external plugin)
 set(OMIT_QCC FALSE CACHE STRING "") #Don't include QCC
+if(OMIT_QCC)
+	list(APPEND FTE_COMMON_DEFINITIONS OMIT_QCC)
+endif()
 
 # Networking options
 set(NQPROT TRUE CACHE STRING "") #act as an nq client/server, with nq gamecode.
