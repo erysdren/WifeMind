@@ -6,7 +6,7 @@
 
 vecV_t vertbuf[65535];
 
-swimage_t pvr_nulltex =
+pvrimage_t pvr_nulltex =
 {
 	1, 1, 0, 0, 0, 0
 };
@@ -29,6 +29,8 @@ static struct
 	int wbatch;
 	int maxwbatches;
 	batch_t *wbatches;
+	int mipfilter[3];
+	int picfilter[3];
 } shaderstate;
 
 ////////////////////////////////////////////////////////////////
@@ -374,6 +376,12 @@ static void deformgen(const deformv_t *deformv, int cnt, vecV_t *src, vecV_t *ds
 }
 //end xyz
 ////////////////////////////////////////////////////////////////
+
+void PVR_UpdateFiltering(image_t *imagelist, int filtermip[3], int filterpic[3], int mipcap[2], float lodbias, float anis)
+{
+	memcpy(shaderstate.mipfilter, filtermip, sizeof(shaderstate.mipfilter));
+	memcpy(shaderstate.picfilter, filterpic, sizeof(shaderstate.picfilter));
+}
 
 void PVRBE_SelectMode(backendmode_t mode)
 {

@@ -1,15 +1,13 @@
 
 #include <dc/pvr.h>
 
-typedef struct
-{
-	int pwidth;
-	int pheight;
-	int pwidthmask;
-	int pheightmask;
-	int pitch;
-	unsigned int data[1];
-} swimage_t;
+typedef struct pvrimage_s {
+	uploadfmt_t encoding;
+	int width;
+	int height;
+	int size;
+	pvr_ptr_t data;
+} pvrimage_t;
 
 typedef struct 
 {
@@ -101,7 +99,7 @@ typedef union
 	{
 		struct wqcom_s com;
 
-		swimage_t *texture;
+		pvrimage_t *texture;
 		int numverts;
 		swvert_t verts[1];
 	} trifan;
@@ -109,7 +107,7 @@ typedef union
 	{
 		struct wqcom_s com;
 
-		swimage_t *texture;
+		pvrimage_t *texture;
 		int numverts;
 		int numidx;
 		swvert_t verts[1];

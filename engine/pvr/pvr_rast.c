@@ -39,7 +39,7 @@ cvar_t sw_fthreads = CVAR("sw_fthreads", "0");
 struct workqueue_s commandqueue;
 struct workqueue_s spanqueue;
 
-static void WT_Triangle(swthread_t *th, swimage_t *img, swvert_t *v1, swvert_t *v2, swvert_t *v3)
+static void WT_Triangle(swthread_t *th, pvrimage_t *img, swvert_t *v1, swvert_t *v2, swvert_t *v3)
 {
 
 }
@@ -187,7 +187,7 @@ static int WT_TransformVertXY(swthread_t *th, swvert_t *v)
 	return result;
 }
 
-static void WT_ClipTriangle(swthread_t *th, swimage_t *img, swvert_t *v1, swvert_t *v2, swvert_t *v3)
+static void WT_ClipTriangle(swthread_t *th, pvrimage_t *img, swvert_t *v1, swvert_t *v2, swvert_t *v3)
 {
 	unsigned int cflags;
 	swvert_t final[2][64];

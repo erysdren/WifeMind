@@ -4,94 +4,60 @@
 
 void PVR_DestroyTexture(texid_t tex)
 {
-	swimage_t *img = tex->ptr;
+	pvrimage_t *img = tex->ptr;
 	tex->ptr = NULL;
 
 	/*make sure its not in use by the renderer*/
 	SWRast_Sync(&commandqueue);
 
 	/*okay, it can be killed*/
+	pvr_mem_free(img->data);
 	BZ_Free(img);
-}
-
-void PVR_UpdateFiltering(image_t *imagelist, int filtermip[3], int filterpic[3], int mipcap[2], float lodbias, float anis)
-{
-	//always nearest...
 }
 
 qboolean PVR_LoadTextureMips(texid_t tex, const struct pendingtextureinfo *mips)
 {
-	swimage_t *img;
-	int i;
-	int nw = mips->mip[0].width;
-	int nh = mips->mip[0].height;
-	qbyte *indata = mips->mip[0].data;
-	qbyte *imgdata;
-
+	pvrimage_t *img;
 
 	if (mips->type != PTI_2D)
+		return false;
+
+	if (mips->mip[0].datasize % 32)
 		return false;
 
 	//only accept formats that actually make sense here.
 	switch(mips->encoding)
 	{
-	case PTI_RGBA8:
-	case PTI_RGBX8:
-	case PTI_BGRA8:
-	case PTI_BGRX8:
+	case PTI_ARGB1555: //16bit alpha format
+	case PTI_ARGB1555_TW: //16bit alpha format, twiddled
+	case PTI_ARGB1555_TW_VQ: //16bit alpha format, vq compressed, twiddled
+	case PTI_RGB565: //16bit format
+	case PTI_RGB565_TW: //16bit format, twiddled
+	case PTI_RGB565_TW_VQ: //16bit format, vq compressed, twiddled
+	case PTI_ARGB4444: //16bit alpha format
+	case PTI_ARGB4444_TW: //16bit alpha format, twiddled
+	case PTI_ARGB4444_TW_VQ: //16bit alpha format, vq compressed, twiddled
 		break;
 	default:
 		return false;
 	}
 
-	img = BZ_Malloc(sizeof(*img) - sizeof(img->data) + (nw * nh * 4));
-	imgdata = (qbyte*)(img+1) - sizeof(img->data);
+	img = BZ_Malloc(sizeof(pvrimage_t));
 	tex->ptr = img;
 
-	img->pwidth = nw;
-	img->pheight = nh;
-	img->pitch = nw;
+	img->encoding = mips->encoding;
+	img->width = mips->mip[0].width;
+	img->height = mips->mip[0].height;
+	img->size = mips->mip[0].datasize;
+	img->data = pvr_mem_malloc(img->size);
 
-	//precalculated
-	img->pwidthmask = nw-1;
-	img->pheightmask = nh-1;
-
-	if (mips->encoding == PTI_RGBA8 || mips->encoding == PTI_RGBX8)
-	{	//assuming PC hardware is bgr
-		if (mips->encoding == PTI_RGBX8)
-		{
-			for (i = 0; i < nw*nh*4; i+=4)
-			{
-				imgdata[i+0] = indata[i+2];
-				imgdata[i+1] = indata[i+1];
-				imgdata[i+2] = indata[i+0];
-				imgdata[i+3] = 255;
-			}
-		}
-		else
-		{
-			for (i = 0; i < nw*nh*4; i+=4)
-			{
-				imgdata[i+0] = indata[i+2];
-				imgdata[i+1] = indata[i+1];
-				imgdata[i+2] = indata[i+0];
-				imgdata[i+3] = indata[i+3];
-			}
-		}
-	}
-	else
-	{
-		memcpy(imgdata, indata, (nw * nh * 4));
-		if (mips->encoding == PTI_BGRX8)
-			for (i = 0; i < nw*nh*4; i+=4)
-				imgdata[i+3] = 255;
+	if (!img->data) {
+		Con_Printf("Failed to allocate %d of texture memory\n", img->size);
+		BZ_Free(img);
+		return false;
 	}
 
-//	for (i = 0; i < mips->mipcount; i++)
-//		if (mips->mip[i].needfree)
-//			Z_Free(mips->mip[i].data);
-//	if (mips->extrafree)
-//		Z_Free(mips->extrafree);
+	pvr_txr_load(mips->mip[0].data, img->data, img->size);
 
 	return true;
 }
