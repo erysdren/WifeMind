@@ -1,7 +1,8 @@
 #include "quakedef.h"
 #include <arch/timer.h>
+#include <kos/dbgio.h>
+#include <kos/thread.h>
 
-#define MAXPRINTMSG 1024 // Yes
 qboolean isDedicated = false;
 
 double Sys_DoubleTime(void)
@@ -12,22 +13,31 @@ double Sys_DoubleTime(void)
 
 unsigned int Sys_Milliseconds(void)
 {
-	return timer_ms_gettime64();
+	uint64_t tick = timer_ns_gettime64();
+	return (unsigned int)(tick / 1000);
 }
 
 NORETURN void VARGS Sys_Error(const char *error, ...)
 {
+	va_list ap;
+	char msg[1024];
+
 	COM_WorkerAbort(error);
 
-	//FIXME: panic! everyone panic!
-	//you might want to figure out some way to display the message...
-	for(;;)
-		;
+	va_start (ap, error);
+	vsnprintf(msg, sizeof(msg), error, ap);
+	va_end(ap);
+
+	fputs(msg, stderr);
+	fflush(stderr);
+
+	exit(1);
 }
 
 void Sys_Sleep(double seconds)
 {
 	//yields to other processes/threads for a bit.
+	thd_sleep(seconds * 1000.0);
 }
 
 void Sys_Quit(void)
@@ -53,18 +63,17 @@ void Sys_Init(void)
 }
 
 /*prints to dedicated server console or debug output*/
-void VARGS Sys_Printf (char *fmt, ...)
+void VARGS Sys_Printf(char *fmt, ...)
 {
-	va_list		argptr;
-	char		msg[MAXPRINTMSG];
+	va_list ap;
+	char msg[1024];
 
-	va_start (argptr,fmt);
-	vsnprintf(msg,sizeof(msg)-1, fmt,argptr);
-	msg[sizeof(msg)-1] = 0;	//_vsnprintf sucks.
-	va_end (argptr);
+	va_start (ap, fmt);
+	vsnprintf(msg, sizeof(msg), fmt, ap);
+	va_end(ap);
 
-	//no idea what the stdout is hooked up to, lets try it anyway.
-	printf("%s", msg);
+	fputs(msg, stderr);
+	fflush(stderr);
 }
 
 /*returns the system video mode settings, ish*/
@@ -194,7 +203,7 @@ char *Sys_URIScheme_NeedsRegistering(void)
 
 int main( int argc, char **argv)
 {
-	float time, lasttime;
+	float time, newtime, oldtime;
 	quakeparms_t parms;
 
 	memset(&parms, 0, sizeof(parms));
@@ -210,13 +219,22 @@ int main( int argc, char **argv)
 	Host_Init(&parms);
 
 	//main loop
-	lasttime = Sys_DoubleTime();
+	oldtime = 0;
 
 	while (1)
 	{
-		time = Sys_DoubleTime();
-		Host_Frame(time - lasttime);
-		lasttime = time;
+		double sleeptime;
+
+		newtime = Sys_DoubleTime();
+		time = newtime - oldtime;
+
+		Sys_Printf("oldtime=%g newtime=%g time=%g sleeptime=%g\n", oldtime, newtime, time, sleeptime);
+
+		sleeptime = Host_Frame(time);
+		oldtime = newtime;
+
+		if (sleeptime)
+			Sys_Sleep(sleeptime);
 	}
 
 	return 0;
