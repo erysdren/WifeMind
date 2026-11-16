@@ -3344,7 +3344,7 @@ static const struct tm *QCC_CurrentTime(void)
 	return localtime(&t);
 }
 
-#if (_POSIX_C_SOURCE >= 2 || defined(_WIN32)) && !defined(__PSP__)
+#if (_POSIX_C_SOURCE >= 2 || defined(_WIN32)) && !defined(__PSP__) && !defined(__KOS__)
 #define HAVE_POPEN
 #endif
 #ifdef HAVE_POPEN

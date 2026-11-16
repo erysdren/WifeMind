@@ -249,7 +249,7 @@ typedef struct image_s
 	union
 	{
 		int nosyntaxerror;
-#if defined(D3DQUAKE) || defined(SWQUAKE)
+#if defined(D3DQUAKE) || defined(SWQUAKE) || defined(PVRQUAKE)
 		struct
 		{
 			void *ptr;	//texture

@@ -1274,6 +1274,12 @@ static void R_RegisterBuiltinRenderers(void)
 		R_RegisterRenderer(NULL, &swrendererinfo);
 	}
 	#endif
+	#ifdef PVRQUAKE
+	{
+		extern rendererinfo_t pvrrendererinfo;
+		R_RegisterRenderer(NULL, &pvrrendererinfo);
+	}
+	#endif
 	#ifdef D3D8QUAKE
 	{
 		extern rendererinfo_t d3d8rendererinfo;

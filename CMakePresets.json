@@ -93,6 +93,13 @@
 			"binaryDir": "build-kos",
 			"toolchainFile": "$env{KOS_CMAKE_TOOLCHAIN}",
 			"cacheVariables": {
+				"KOS": true,
+				"MAX_CLIENTS": "4",
+				"SUBSERVERS": false,
+				"FTPSERVER": false,
+				"OMIT_QCC": true,
+				"HAVE_HTTPSV": false,
+				"VOICECHAT": false,
 				"FTE_ENGINE_USE_SDL": false,
 				"FTE_PLUGINS_START_ENABLED": false,
 				"FTE_TOOLS_START_ENABLED": false,
@@ -101,6 +108,7 @@
 				"FTE_VENDOR_DEPENDENCIES": true,
 				"FTE_ENGINE_START_ENABLED": false,
 				"FTE_ENGINE_CLIENT": true,
+				"FTE_ENGINE_USE_SQL": false,
 				"FTE_ENGINE_RENDERER": "pvr"
 			}
 		},

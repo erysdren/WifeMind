@@ -286,6 +286,9 @@ set(FTE_ENGINE_CLIENT_SOURCES
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_CLIENT_DIR}/sys_linux.c>
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_COMMON_DIR}/sys_linux_threads.c>
 
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${KOS}>>:${FTE_ENGINE_CLIENT_DIR}/sys_kos.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${KOS}>>:${FTE_ENGINE_CLIENT_DIR}/cd_null.c>
+
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${PSP}>>:${FTE_ENGINE_CLIENT_DIR}/sys_psp.c>
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${PSP}>>:${FTE_ENGINE_CLIENT_DIR}/cd_null.c>
 
@@ -350,6 +353,13 @@ set(FTE_ENGINE_CLIENT_SW_SOURCES
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${DJGPP}>>:${FTE_ENGINE_SW_DIR}/sw_viddos.c>
 )
 
+set(FTE_ENGINE_CLIENT_PVR_SOURCES
+	${FTE_ENGINE_PVR_DIR}/pvr_backend.c
+	${FTE_ENGINE_PVR_DIR}/pvr_image.c
+	${FTE_ENGINE_PVR_DIR}/pvr_rast.c
+	${FTE_ENGINE_PVR_DIR}/pvr_vid.c
+)
+
 if(FTE_ENGINE_CLIENT)
 	add_executable(fteqw WIN32
 		${FTE_ENGINE_COMMON_SOURCES}
@@ -361,6 +371,7 @@ if(FTE_ENGINE_CLIENT)
 		${FTE_ENGINE_CLIENT_D3DGL_SOURCES}
 		${FTE_ENGINE_CLIENT_D3D_SOURCES}
 		${FTE_ENGINE_CLIENT_SW_SOURCES}
+		${FTE_ENGINE_CLIENT_PVR_SOURCES}
 	)
 	fte_add_common(fteqw)
 	target_compile_options(fteqw
@@ -507,6 +518,7 @@ if(0)
 		${FTE_ENGINE_CLIENT_D3DGL_SOURCES}
 		${FTE_ENGINE_CLIENT_D3D_SOURCES}
 		${FTE_ENGINE_CLIENT_SW_SOURCES}
+		${FTE_ENGINE_CLIENT_PVR_SOURCES}
 	)
 	fte_add_common(fteqw-cl)
 	target_compile_definitions(fteqw-cl
