@@ -48,9 +48,9 @@ typedef struct
 	unsigned int clipflags;	/*1=left,2=right,4=top,8=bottom,16=near*/
 } swvert_t;
 
-#define WQ_SIZE 1024*1024*8
+#define WQ_SIZE 8
 #define WQ_MASK (WQ_SIZE-1)
-#define WQ_MAXTHREADS 64
+#define WQ_MAXTHREADS 1
 struct workqueue_s
 {
 	unsigned int numthreads;

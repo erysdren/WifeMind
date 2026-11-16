@@ -4,8 +4,6 @@
 #include "shader.h"
 #include "glquake.h"
 
-vecV_t vertbuf[65535];
-
 pvrimage_t pvr_nulltex =
 {
 	1, 1, 0, 0, 0, 0
@@ -385,54 +383,12 @@ void PVR_UpdateFiltering(image_t *imagelist, int filtermip[3], int filterpic[3],
 
 void PVRBE_SelectMode(backendmode_t mode)
 {
+
 }
 
 void PVRBE_TransformVerticies(swvert_t *v, mesh_t *mesh)
 {
-	int i;
 
-	vecV_t *xyz;
-
-	/*generate vertex blends*/
-	if (mesh->xyz2_array)
-	{
-		xyz = vertbuf;
-		for (i = 0; i < mesh->numvertexes; i++)
-		{
-			VectorInterpolate(mesh->xyz_array[i], mesh->xyz_blendw[1], mesh->xyz2_array[i], xyz[i]);
-		}
-	}
-	/*else if (skeletal)
-	{
-	}
-	*/
-	else
-	{
-		xyz = mesh->xyz_array;
-	}
-
-	/*now apply any shader deforms*/
-	if (shaderstate.curshader->numdeforms)
-	{
-		deformgen(&shaderstate.curshader->deforms[0], mesh->numvertexes, xyz, vertbuf, mesh);
-		xyz = vertbuf;
-		for (i = 1; i < shaderstate.curshader->numdeforms; i++)
-		{
-			deformgen(&shaderstate.curshader->deforms[i], mesh->numvertexes, xyz, xyz, mesh);
-		}
-	}
-
-	for (i = 0; i < mesh->numvertexes; i++, v++)
-	{
-		VectorCopy(xyz[i], v->vcoord);
-
-		Vector2Copy(mesh->st_array[i], v->tccoord);
-
-//		v->colour[0] = mesh->colors4b_array[i][0];
-//		v->colour[1] = mesh->colors4b_array[i][1];
-//		v->colour[2] = mesh->colors4b_array[i][2];
-//		v->colour[3] = mesh->colors4b_array[i][3];
-	}
 }
 
 static void PVRBE_DrawMesh_Internal(shader_t *shader, mesh_t *mesh, struct vbo_s *vbo, struct texnums_s *texnums, unsigned int be_flags)
