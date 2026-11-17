@@ -626,9 +626,13 @@ cvar_t r_part_classic_expgrav = CVARFD("r_part_classic_expgrav", "10", CVAR_ARCH
 cvar_t r_part_classic_opaque = CVARFD("r_part_classic_opaque", "0", CVAR_ARCHIVE, "Disables transparency on classic particles, for the oldskool look.");
 cvar_t r_part_classic_square = CVARFD("r_part_classic_square", "0", CVAR_ARCHIVE, "Enables square particles, for the oldskool look.");
 
+#ifdef __KOS__
+cvar_t r_part_maxparticles = CVAR("r_part_maxparticles", "512");
+cvar_t r_part_maxdecals = CVAR("r_part_maxdecals", "64");
+#else
 cvar_t r_part_maxparticles = CVAR("r_part_maxparticles", "65536");
 cvar_t r_part_maxdecals = CVAR("r_part_maxdecals", "8192");
-
+#endif
 
 particleengine_t *pe;
 

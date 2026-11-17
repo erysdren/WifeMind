@@ -205,10 +205,25 @@ char *Sys_URIScheme_NeedsRegistering(void)
 	return NULL;
 }
 
+#define MAIN_STACK_SIZE (32 * 1024)
+static void init_thread_stack(void) {
+	kthread_t* current = thd_get_current();
+	if (current) {
+		void* new_stack = malloc(MAIN_STACK_SIZE);
+		if (new_stack) {
+			current->stack = new_stack;
+			current->stack_size = MAIN_STACK_SIZE;
+			current->flags |= THD_OWNS_STACK;
+		}
+	}
+}
+
 int main( int argc, char **argv)
 {
 	float time, newtime, oldtime;
 	quakeparms_t parms;
+
+	init_thread_stack();
 
 	memset(&parms, 0, sizeof(parms));
 
