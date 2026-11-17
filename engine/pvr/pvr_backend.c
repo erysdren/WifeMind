@@ -607,24 +607,37 @@ void PVRBE_DrawWorld(batch_t **worldbatches)
 
 	PVRBE_Set2D();
 }
+
 void PVRBE_Init(void)
 {
 	memset(&sh_config, 0, sizeof(sh_config));
-	sh_config.texfmt[PTI_BGRA8] = true;
-	sh_config.texfmt[PTI_BGRX8] = true;
-	sh_config.texfmt[PTI_RGBA8] = true;
-	sh_config.texfmt[PTI_RGBX8] = true;
+	sh_config.texfmt[PTI_ARGB1555] = true;
+	sh_config.texfmt[PTI_ARGB1555_TW] = true;
+	sh_config.texfmt[PTI_ARGB1555_TW_VQ] = true;
+	sh_config.texfmt[PTI_RGB565] = true;
+	sh_config.texfmt[PTI_RGB565_TW] = true;
+	sh_config.texfmt[PTI_RGB565_TW_VQ] = true;
+	sh_config.texfmt[PTI_ARGB4444] = true;
+	sh_config.texfmt[PTI_ARGB4444_TW] = true;
+	sh_config.texfmt[PTI_ARGB4444_TW_VQ] = true;
 	BE_InitTables();
 }
+
 void PVRBE_GenBrushModelVBO(struct model_s *mod)
 {
+
 }
+
 void PVRBE_ClearVBO(struct vbo_s *vbo, qboolean dataonly)
 {
+
 }
+
 void PVRBE_UploadAllLightmaps(void)
 {
+
 }
+
 static void SWR_RotateForEntity (float *m, float *modelview, const entity_t *e, const model_t *mod)
 {
 	if ((e->flags & RF_WEAPONMODEL) && r_refdef.playerview->viewentity > 0)
