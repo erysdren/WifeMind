@@ -1,7 +1,11 @@
 #include "quakedef.h"
 #include <arch/timer.h>
+#include <kos.h>
 #include <kos/dbgio.h>
 #include <kos/thread.h>
+#include <arch/types.h>
+
+KOS_INIT_FLAGS(INIT_DEFAULT);
 
 qboolean isDedicated = false;
 
