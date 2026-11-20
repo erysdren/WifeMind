@@ -15,6 +15,7 @@ set(GAME_DEFAULTPORT "27500" CACHE STRING "") #slightly reduces the chance of pe
 set(GAME_IDENTIFYINGFILES FALSE CACHE STRING "") #with multiple games, this string-list gives verification that the basedir is actually valid. if null, will just be assumed correct.
 set(GAME_DOWNLOADSURL FALSE CACHE STRING "") #url for the package manger to update from
 set(GAME_DEFAULTCMDS FALSE CACHE STRING "") #a string containing the things you want to exec in order to override default.cfg
+set(GAME_MAINCONFIG "fte.cfg" CACHE STRING "") #name of main user config file to write
 
 set(ENGINE_HAS_ZIP TRUE CACHE STRING "") #when defined, the engine is effectively a self-extrating zip with the gamedata zipped onto the end (if it in turn contains nested packages then they should probably be STOREd pk3s)
 

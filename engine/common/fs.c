@@ -768,7 +768,9 @@ static ftemanifest_t *FS_Manifest_Create(const char *syspath, const char *basedi
 	if (basedir)
 		man->basedir = Z_StrDup(basedir);	//this should be a system path.
 
-#ifdef QUAKETC
+#if defined(GAME_MAINCONFIG)
+	man->mainconfig = Z_StrDup(GAME_MAINCONFIG);
+#elif defined(QUAKETC)
 	man->mainconfig = Z_StrDup("config.cfg");
 #else
 	man->mainconfig = Z_StrDup("fte.cfg");
